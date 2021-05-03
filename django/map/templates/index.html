@@ -76,38 +76,39 @@
 
             </div>
         </nav>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">SID</th>
+            <th scope="col">SEASON</th>
+            <th scope="col">NUMBER</th>
+            <th scope="col">BASIN</th>
+            <th scope="col">SUBBASIN</th>
+            <th scope="col">NAME</th>
+            <th scope="col">ISO_TIME</th>
+            <th scope="col">NATURE</th>
+            <th scope="col">LAT</th>
+            <th scope="col">LON</th>
+            <th scope="col">WMO_WIND</th>
+            <th scope="col">WMO_PRES</th>
+            <th scope="col">WMO_AGENCY</th>
+            <th scope="col">TRACK_TYPE</th>
+            <th scope="col">DIST2LAND</th>
+            <th scope="col">LANDFALL</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for row in hurricanes %}
+          <tr>
+            {% for element in row %}
+            <td>{{ element }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">SID</th>
-          <th scope="col">SEASON</th>
-          <th scope="col">NUMBER</th>
-          <th scope="col">BASIN</th>
-          <th scope="col">SUBBASIN</th>
-          <th scope="col">NAME</th>
-          <th scope="col">ISO_TIME</th>
-          <th scope="col">NATURE</th>
-          <th scope="col">LAT</th>
-          <th scope="col">LON</th>
-          <th scope="col">WMO_WIND</th>
-          <th scope="col">WMO_PRES</th>
-          <th scope="col">WMO_AGENCY</th>
-          <th scope="col">TRACK_TYPE</th>
-          <th scope="col">DIST2LAND</th>
-          <th scope="col">LANDFALL</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for row in hurricanes %}
-        <tr>
-          {% for element in row %}
-          <td>{{ element }}</td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
