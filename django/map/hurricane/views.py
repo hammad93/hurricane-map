@@ -7,7 +7,12 @@ def index(request):
         cursor.execute("SELECT SID,SEASON,NUMBER, BASIN, SUBBASIN, NAME, ISO_TIME, NATURE,LAT, LON, WMO_WIND, WMO_PRES, WMO_AGENCY, TRACK_TYPE, DIST2LAND,LANDFALL from hurricanes limit 10")
         results = cursor.fetchall()
 
+    with connection.cursor() as cursor:
+        cursor.execute("select distinct SID, NAME from hurricanes where NAME not in ('', 'NOT_NAMED')")
+        names = cursor.fetchall()
+
     return render(request, 'index.html', {
                 'hurricanes': results,
+                'names': names,
     })
 
