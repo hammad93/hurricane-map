@@ -9,10 +9,7 @@ def index(request):
     if request.GET.get('type', False) :
         type = request.GET['type']
         if type == 'plot' :
-            return HttpResponse(
-                json.dumps(plot(request)),
-                content_type = 'application/javascript; charset=utf8'
-            )
+            return json.dumps(plot(request))
         else :
             return None
     with connection.cursor() as cursor:

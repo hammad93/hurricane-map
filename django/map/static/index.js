@@ -16,9 +16,10 @@ function myMap() {
     document.getElementById("googleMap").style.width = window.innerWidth - 250 + "px";
 }
 
+var plot;
 document.getElementById('plot_button').onclick = function() {
     var sid = document.getElementById("inputGroupSelect04").value;
-    var plot = $.get('/?type=plot&SID=' + sid, (data, status) => {
+    plot = $.get('/?type=plot&SID=' + sid, (data, status) => {
         console.log('test ' + sid + data);
         return data;
     });
