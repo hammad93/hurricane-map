@@ -28,8 +28,8 @@ a, a:hover, a:focus {
     margin-left: -250px;
 }
 #sidebar {
-    min-width: 250px;
-    max-width: 250px;
+    min-width: 500px;
+    max-width: 500px;
     min-height: 100vh;
     background: #7386D5;
     color: #fff;
