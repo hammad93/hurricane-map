@@ -26,7 +26,7 @@ def index(request):
 
 def plot(request):
     with connection.cursor() as cursor:
-        cursor.execute(f"select SID, NAME, ISO_TIME, LAT, LON, WMO_WIND, WMO_PRES from hurricanes having SID = {request.GET['SID']} order by ISO_TIME")
+        cursor.execute(f"select SID, NAME, ISO_TIME, LAT, LON, WMO_WIND, WMO_PRES from hurricanes where SID = '{request.GET['SID']}' order by ISO_TIME")
         entries = cursor.fetchall()
     results = {
         ['lat'] : [],
