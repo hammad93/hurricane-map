@@ -14,3 +14,11 @@ function myMap() {
     var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
     document.getElementById("googleMap").style.width = window.innerWidth - 250 + "px";
 }
+
+document.getElementById('plot_button').onclick = function() {
+    var sid = document.getElementById("inputGroupSelect04").value;
+    var plot;
+    $.get('/?type=plot&SID=' + sid, function(data, status){
+        console.log('test ' + sid)
+    });
+}
