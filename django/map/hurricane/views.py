@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.db import connection
 from django.shortcuts import render
+import json
 
 def index(request):
 
@@ -8,7 +9,10 @@ def index(request):
     if request.GET.get('type', False) :
         type = request.GET['type']
         if type == 'plot' :
-            return plot(request)
+            return HttpResponse(
+                json.dumps(plot(request)),
+                content_type = 'application/javascript; charset=utf8'
+            )
         else :
             return None
     with connection.cursor() as cursor:
