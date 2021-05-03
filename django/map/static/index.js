@@ -12,5 +12,5 @@ function myMap() {
       zoom:5,
     };
     var map = new google.maps.Map(document.getElementById("googleMap"),mapProp);
-    document.getElementById("googleMap").style.width = window.innerWidth - 250;
+    document.getElementById("googleMap").style.width = window.innerWidth - 250 + "px";
 }
