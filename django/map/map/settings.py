@@ -33,7 +33,7 @@ SECRET_KEY = keys['django']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fluids.ai']
 
 
 # Application definition
@@ -86,6 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'OPTIONS': {
             'read_default_file': keys['path'] + 'database.key',
+            'unix_socket': '/opt/bitnami/mysql/tmp/mysql.sock'
         },
     }
 }
