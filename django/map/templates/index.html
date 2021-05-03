@@ -1,1 +1,54 @@
-hello world {{ hurricanes }}
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+    <h1>Hello, world! {{ hurricanes }}}</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">SID</th>
+          <th scope="col">SEASON</th>
+          <th scope="col">NUMBER</th>
+          <th scope="col">BASIN</th>
+          <th scope="col">SUBBASIN</th>
+          <th scope="col">NAME</th>
+          <th scope="col">ISO_TIME</th>
+          <th scope="col">NATURE</th>
+          <th scope="col">LAT</th>
+          <th scope="col">LON</th>
+          <th scope="col">WMO_WIND</th>
+          <th scope="col">WMO_PRES</th>
+          <th scope="col">WMO_AGENCY</th>
+          <th scope="col">TRACK_TYPE</th>
+          <th scope="col">DIST2LAND</th>
+          <th scope="col">LANDFALL</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in hurricanes %}
+        {‌{ items }}
+        <tr>
+          {% for element in row %}
+          <td>{{ element }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
