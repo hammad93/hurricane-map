@@ -19,6 +19,6 @@ document.getElementById('plot_button').onclick = function() {
     var sid = document.getElementById("inputGroupSelect04").value;
     var plot;
     $.get('/?type=plot&SID=' + sid, function(data, status){
-        console.log('test ' + sid)
+        console.log('test ' + sid + data)
     });
 }
