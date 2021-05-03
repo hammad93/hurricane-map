@@ -33,10 +33,10 @@ def plot(request):
         cursor.execute(f"select SID, NAME, ISO_TIME, LAT, LON, WMO_WIND, WMO_PRES from hurricanes where SID = '{request.GET['SID']}' order by ISO_TIME")
         entries = cursor.fetchall()
     results = {
-        ['lat'] : [],
-        ['lon'] : [],
-        ['wind'] : [],
-        ['pressure'] : []
+        'lat' : [],
+        'lon' : [],
+        'wind' : [],
+        'pressure' : []
     }
     for entry in entries :
         results['lat'].append(entry[3])
