@@ -23,13 +23,17 @@ document.getElementById('plot_button').onclick = function() {
         console.log('test ' + sid + data);
         return data;
     });
-    var i;
-    var path = []
-    for (i = 0; i < plot.length; i++) {
-        path.push(new google.maps.LatLng(plot["lat"][i], plot["lon"][i]))
-    }
-    var polyline = new google.maps.Polyline({path:path, strokeColor: "#FF0000", strokeOpacity: 1.0, strokeWeight: 2});
-    polyline.setMap(map);
-    map.setCenter(new google.maps.LatLng(plot["lat"][0], plot["lon"][0]), 6);
+    plot.then(function(e){
+        plot.data = JSON.parse(plot.responseText);
+        console.log(plot.data);
+        var i;
+        var path = []
+        for (i = 0; i < plot.data["lat"].length; i++) {
+            path.push(new google.maps.LatLng(plot.data["lat"][i], plot.data["lon"][i]))
+        }
+        var polyline = new google.maps.Polyline({path:path, strokeColor: "#FF0000", strokeOpacity: 1.0, strokeWeight: 2});
+        polyline.setMap(map);
+        map.setCenter(new google.maps.LatLng(plot.data["lat"][0], plot.data["lon"][0]), 6);
+    });
 
 }
