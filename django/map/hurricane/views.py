@@ -17,7 +17,7 @@ def index(request):
         results = cursor.fetchall()
 
     with connection.cursor() as cursor:
-        cursor.execute("select distinct SID, NAME from hurricanes where NAME not in ('', 'NOT_NAMED') order by NAME")
+        cursor.execute("select distinct SID, NAME, SUBBASIN, YEAR(CAST(ISO_TIME as date)) as YEAR from hurricanes where NAME not in ('', 'NOT_NAMED') order by NAME")
         names = cursor.fetchall()
 
     return render(request, 'index.html', {
