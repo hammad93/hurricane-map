@@ -3,3 +3,6 @@
 
 # Keys & Passwords
 *.key
+
+# Other
+*.pyc
