@@ -7,5 +7,4 @@ A graphical user interface through a web application is created to display archi
 ```
 This repository uses Django to serve the hurricane artificial intelligence.
 
-## TODO
-Following this tutorial, https://docs.djangoproject.com/en/3.2/intro/tutorial01/
+This repository is also setup using a SQL database which is configured with keys unavailable from the public git repository. However, it can run on any other SQL database with the same data structure.
