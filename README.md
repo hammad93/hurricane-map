@@ -11,6 +11,8 @@ This repository is also setup using a SQL database which is configured with keys
 
 ### SystemD Service File
 
+Use the commands `systemctl status fluids` or `systemctl restart fluids` for management of the daemon.
+
 ```commandline
 [Unit]
 Description=Runs the Django mapping service

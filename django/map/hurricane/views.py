@@ -14,6 +14,8 @@ def index(request):
         type = request.GET['type']
         if type == 'plot' :
             return HttpResponse(json.dumps(plot(request)))
+        if type == 'update' :
+            return HttpResponse(json.dumps(update(request)))
         else :
             return None
     with connection.cursor() as cursor:
