@@ -105,6 +105,9 @@ def update(request):
             storms.append(storm)
 
     # Iterate through storms and populate data
+    with connection.cursor() as cursor:
+        # delete all previous data
+        cursor.execute('DELETE FROM hurricane_live;')
     for storm in storms:
         id = storm['id']
         history = storm['data']['track_history']
@@ -115,8 +118,6 @@ def update(request):
             ''' for time, lat, lon, ins in zip(history[0][1:], history[1][1:], history[2][1:], history[3][1:])]
 
         with connection.cursor() as cursor:
-            # delete all previous data
-            cursor.execute('DELETE FROM hurricane_live;')
             # do insert queries
             for query in queries:
                 cursor.execute(query)
