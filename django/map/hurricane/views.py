@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 from dateutil.parser import parse
-import lxml
+import lxml # used in pands.read_html
 
 def index(request):
 
@@ -102,7 +102,7 @@ def update(request):
                         current_soup.findAll('table')[0].findAll('a')]
             storm['img_urls'] = img_urls
             print(f'[1st img_url]: {storm["img_urls"][0]}')
-        storms.append(storm)
+            storms.append(storm)
 
     # Iterate through storms and populate data
     for storm in storms:
