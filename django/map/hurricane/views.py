@@ -16,7 +16,7 @@ def index(request):
         if type == 'plot' :
             return HttpResponse(json.dumps(plot(request)))
         if type == 'update' :
-            return HttpResponse(json.dumps(update(request)))
+            return HttpResponse(str(update(request)))
         else :
             return None
     with connection.cursor() as cursor:
