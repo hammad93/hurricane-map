@@ -4,6 +4,7 @@ $(document).ready(function () {
         $('#sidebar').toggleClass('active');
     });
 
+    resizeMap();
 });
 
 var map = L.map('map').setView([51.505, -0.09], 13);
@@ -41,7 +42,10 @@ function onMapClick(e) {
         .setContent('You clicked the map at ' + e.latlng.toString())
         .openOn(map);
 }
-
+function resizeMap() {
+    document.getElementById('map').style.width = (window.screen.width - document.getElementById('sidebar').offsetWidth).toString() + "px";
+    map.invalidateSize();
+}
 map.on('click', onMapClick);
 
 
