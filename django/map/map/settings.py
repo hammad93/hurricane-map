@@ -87,6 +87,13 @@ DATABASES = {
         'OPTIONS': {
             'read_default_file': keys['path'] + 'database.key'
         },
+    },
+    'hurricane_archive': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hurricane_archive',
+        'OPTIONS': {
+            'read_default_file': keys['path'] + 'database.key'
+        },
     }
 }
 
