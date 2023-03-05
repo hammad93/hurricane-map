@@ -23,5 +23,10 @@ def index(request):
     
     return render(request, 'index.html', {
                 'hurricanes': hurricanes,
-                'live_storms': live_storms
+                'live_storms': [{
+                    'id': storm[0],
+                    'time': storm[1],
+                    'lat': storm[2],
+                    'lon': storm[3],
+                    'int': storm[4]} for storm in live_storms]
     })

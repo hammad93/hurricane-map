@@ -68,9 +68,11 @@
 
     <!-- Custom JavaScript -->
     <script src="{% static 'index.js' %}"></script>
+    {{ hurricanes|json_script:"hurricanes-data" }}
+    {{ live_storms|json_script:"live_storms-data" }}
     <script type="text/javascript">
-      var hurricanes = "{{hurricanes}}";
-      var live_storms = "{{live_storms}}";
+      var hurricanes = JSON.parse(document.getElementById('hurricanes-data').textContent);
+      var live_storms = JSON.parse(document.getElementById('live_storms-data').textContent);
     </script>
    
   </body>
