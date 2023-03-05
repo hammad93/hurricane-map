@@ -40,7 +40,7 @@ function addMarkersAndLines(groupedData) {
         const opacity = 0.1 + (0.9 * (timeDiff / (mostRecentTime - storms[0].time)));
   
         // add a marker to the map with the calculated opacity
-        const marker = L.marker([storm.lat, storm.lon], { opacity }).addTo(map);
+        const marker = L.marker([storm.lat, storm.lon], {'opacity': opacity, 'zIndexOffset': opacity * 100}).addTo(map);
   
         // add the marker latlng to the polyline latlngs array
         polylineLatLngs.push([storm.lat, storm.lon]);
