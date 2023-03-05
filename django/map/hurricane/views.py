@@ -12,7 +12,7 @@ def index(request):
     # get historical records
     with connection.cursor() as cursor:
         # this query is slightly more efficient than a select *
-        cursor.execute("select distinct SID, NAME, SUBBASIN, YEAR(CAST(ISO_TIME as date)) as YEAR from hurricanes where NAME not in ('', 'NOT_NAMED') order by NAME")
+        cursor.execute("select distinct SID, NAME, SUBBASIN, YEAR(CAST(ISO_TIME as date)) as YEAR from hurricanes.hurricane_archive where NAME not in ('', 'NOT_NAMED') order by NAME")
         hurricanes = cursor.fetchall()
     
     # get live records of global tropical storms
