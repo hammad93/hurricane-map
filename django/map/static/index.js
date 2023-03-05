@@ -5,37 +5,63 @@ $(document).ready(function () {
     });
 
     resizeMap();
+    addMarkersAndLines(groupData(live_storms));
 });
+function groupData(data) {
+    const result = {};
+    data.forEach(item => {
+      const id = item.id;
+      const time = new Date(item.time);
+      const timestamp = time.getTime();
+      if (result[id]) {
+        result[id].push({ ...item, time: timestamp });
+      } else {
+        result[id] = [{ ...item, time: timestamp }];
+      }
+    });
+    return result;
+}
+function addMarkersAndLines(groupedData) {
+    // create an empty array to hold the polyline latlngs
+    const polylineLatLngs = [];
+  
+    // loop through each storm id in the grouped data
+    for (const id in groupedData) {
+      // get the array of storm objects for this id
+      const storms = groupedData[id];
+  
+      // determine the most recent time for this group
+      const mostRecentTime = Math.max(...storms.map(storm => storm.time));
+  
+      // loop through each storm object in the array
+      storms.forEach((storm, index) => {
+        // calculate the opacity based on the time difference from the most recent time
+        const timeDiff = mostRecentTime - storm.time;
+        const opacity = 0.1 + (0.9 * (timeDiff / (mostRecentTime - storms[0].time)));
+  
+        // add a marker to the map with the calculated opacity
+        const marker = L.marker([storm.lat, storm.lon], { opacity }).addTo(map);
+  
+        // add the marker latlng to the polyline latlngs array
+        polylineLatLngs.push([storm.lat, storm.lon]);
+  
+        // set the marker tooltip content
+        marker.bindTooltip(`ID: ${id}<br>Time: ${new Date(storm.time)}`);
+      });
+  
+      // add a polyline to the map
+      L.polyline(polylineLatLngs, { color: 'red' }).addTo(map);
+  
+      // reset the polyline latlngs array for the next storm id
+      polylineLatLngs.length = 0;
+    }
+}
 
-var map = L.map('map').setView([51.505, -0.09], 13);
-
+var map = L.map('map').setView([0, 0], 2);
 var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
-
-var marker = L.marker([51.5, -0.09]).addTo(map)
-    .bindPopup('<b>Hello world!</b><br />I am a popup.').openPopup();
-
-var circle = L.circle([51.508, -0.11], {
-    color: 'red',
-    fillColor: '#f03',
-    fillOpacity: 0.5,
-    radius: 500
-}).addTo(map).bindPopup('I am a circle.');
-
-var polygon = L.polygon([
-    [51.509, -0.08],
-    [51.503, -0.06],
-    [51.51, -0.047]
-]).addTo(map).bindPopup('I am a polygon.');
-
-
-var popup = L.popup()
-    .setLatLng([51.513, -0.09])
-    .setContent('I am a standalone popup.')
-    .openOn(map);
-
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
