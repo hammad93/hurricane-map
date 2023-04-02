@@ -11,7 +11,7 @@ def index(request):
     '''
     
     # get live records of global tropical storms
-    with connection.cursor() as cursor:
+    with connections['hurricane_live'].cursor() as cursor:
         cursor.execute("select * from hurricane_live")
         live_storms = cursor.fetchall()
     
