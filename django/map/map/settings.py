@@ -94,7 +94,14 @@ DATABASES = {
         'OPTIONS': {
             'read_default_file': keys['path'] + 'database.key'
         },
-    }
+    },
+    'hurricane_live': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hurricane_live',
+        'OPTIONS': {
+            'read_default_file': keys['path'] + 'hurricane-live-db.key'
+        },
+    },
 }
 
 
