@@ -8,18 +8,19 @@ $(document).ready(function () {
     addMarkersAndLines(groupData(live_storms));
 });
 function groupData(data) {
-    const result = {};
-    data.forEach(item => {
-      const id = item.id;
-      const time = new Date(item.time);
-      const timestamp = time.getTime();
-      if (result[id]) {
-        result[id].push({ ...item, time: timestamp });
-      } else {
-        result[id] = [{ ...item, time: timestamp }];
-      }
-    });
-    return result;
+  const result = {};
+  data.forEach(item => {
+    const id = item.id;
+    const time = new Date(item.time);
+    const timestamp = time.getTime();
+    if (result[id]) {
+      result[id].push({ ...item, time: timestamp });
+    } else {
+      result[id] = [{ ...item, time: timestamp }];
+    }
+    result[id].sort((a, b) => b.time - a.time); // sort the storm data by timestamp in descending order
+  });
+  return result;
 }
 function addMarkersAndLines(groupedData) {
     // create an empty array to hold the polyline latlngs
@@ -37,7 +38,7 @@ function addMarkersAndLines(groupedData) {
       storms.forEach((storm, index) => {
         // calculate the opacity based on the time difference from the most recent time
         const timeDiff = mostRecentTime - storm.time;
-        const opacity = 0.1 + (0.9 * (timeDiff / (mostRecentTime - storms[0].time)));
+        const opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60 * 1000))); // 6 days
         
         // record is less than 5 days old from the most recent time
         if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
