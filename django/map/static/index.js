@@ -56,7 +56,7 @@ function addMarkersAndLines(groupedData) {
         const circle = L.circle([storm.lat, storm.lon], {
           'opacity': opacity,
           'zIndexOffset': opacity * 100,
-          'radius': 1000 // specify the radius of the circle in meters
+          'radius': 100000 // specify the radius of the circle in meters
         }).addTo(map);
       });
   
