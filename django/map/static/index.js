@@ -38,15 +38,25 @@ function addMarkersAndLines(groupedData) {
         // calculate the opacity based on the time difference from the most recent time
         const timeDiff = mostRecentTime - storm.time;
         const opacity = 0.1 + (0.9 * (timeDiff / (mostRecentTime - storms[0].time)));
-  
-        // add a marker to the map with the calculated opacity
-        const marker = L.marker([storm.lat, storm.lon], {'opacity': opacity, 'zIndexOffset': opacity * 100}).addTo(map);
-  
+        
+        // record is less than 5 days old from the most recent time
+        if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
+          // add a marker to the map with the calculated opacity
+          const marker = L.marker([storm.lat, storm.lon], {'zIndexOffset': opacity * 100}).addTo(map);
+    
+          // set the marker tooltip content
+          marker.setOpacity(opacity);
+          marker.bindTooltip(`ID: ${id}<br>Time: ${new Date(storm.time)}`);
+        }
         // add the marker latlng to the polyline latlngs array
         polylineLatLngs.push([storm.lat, storm.lon]);
-  
-        // set the marker tooltip content
-        marker.bindTooltip(`ID: ${id}<br>Time: ${new Date(storm.time)}`);
+        
+        // add a circle to the map with the calculated opacity
+        const circle = L.circle([storm.lat, storm.lon], {
+          'opacity': opacity,
+          'zIndexOffset': opacity * 100,
+          'radius': 1000 // specify the radius of the circle in meters
+        }).addTo(map);
       });
   
       // add a polyline to the map
