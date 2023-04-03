@@ -26,7 +26,9 @@
             </div>
 
             <ul class="list-unstyled components">
-                <p>There are currently no active tropical storms around the globe</p>
+                {% for hurricane in live_storms %}
+              <p>{{ hurricane['id'] }}
+              </p>{% endfor %}
                 <div class="card bg-white text-dark" style="margin-left:50px; width: 400px;">
                   <div class="card-body">
                     <h5 class="card-title">Hurricane Simulation Archive</h5>
