@@ -5,7 +5,6 @@ $(document).ready(function () {
     });
     addMarkersAndLines(groupData(live_storms));
     resizeMap();
-    map.zoomOut();
 });
 function groupData(data) {
   const result = {};
@@ -92,7 +91,7 @@ function resizeMap() {
     document.getElementById('map').style.width = window.screen.width.toString() + "px";
     document.getElementById('map').style.height = window.screen.height.toString() + "px";
     map.invalidateSize();
-    map.fitBounds(getVisibleMarkers());
+    map.fitBounds(getVisibleMarkers().pad(0.5));
 }
 map.on('click', onMapClick);
 
