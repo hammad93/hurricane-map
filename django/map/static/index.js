@@ -80,7 +80,7 @@ function onMapClick(e) {
         .openOn(map);
 }
 function resizeMap() {
-    document.getElementById('map').style.width = (window.screen.width - document.getElementById('sidebar').offsetWidth).toString() + "px";
+    document.getElementById('map').style.width = window.screen.width.toString() + "px";
     map.invalidateSize();
 }
 map.on('click', onMapClick);
