@@ -80,13 +80,13 @@ function onMapClick(e) {
         .openOn(map);
 }
 function getVisibleMarkers() {
-    var markerList = [];
+    const bounds = new L.LatLngBounds();
     map.eachLayer(function(layer) {
         if ((layer instanceof L.Marker) && (map.getBounds().contains(layer.getLatLng()))){
-            markerList.push(layer.getLatLng());
+            bounds.extend(layer.getLatLng());
         }
     });
-    return markerList;
+    return bounds;
 }
 function resizeMap() {
     document.getElementById('map').style.width = window.screen.width.toString() + "px";
