@@ -3,9 +3,8 @@ $(document).ready(function () {
     $('#sidebarCollapse').on('click', function () {
         $('#sidebar').toggleClass('active');
     });
-
-    resizeMap();
     addMarkersAndLines(groupData(live_storms));
+    resizeMap();
 });
 function groupData(data) {
   const result = {};
