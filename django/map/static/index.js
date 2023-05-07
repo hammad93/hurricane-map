@@ -37,8 +37,11 @@ function addMarkersAndLines(groupedData) {
       storms.forEach((storm, index) => {
         // calculate the opacity based on the time difference from the most recent time
         const timeDiff = mostRecentTime - storm.time;
-        const opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60 * 1000))); // 6 days
-        
+        var opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60 * 1000))); // 6 days
+        if (index > 0) { // everything after the most recent should be more obvious
+	  opacity = Math.max(0, opacity - 0.25);
+	}
+	
         // record is less than 5 days old from the most recent time
         if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
           // add a marker to the map with the calculated opacity
