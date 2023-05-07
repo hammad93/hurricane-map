@@ -5,6 +5,7 @@ $(document).ready(function () {
     });
     addMarkersAndLines(groupData(live_storms));
     resizeMap();
+    map.zoomOut();
 });
 function groupData(data) {
   const result = {};
