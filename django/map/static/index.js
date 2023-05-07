@@ -79,10 +79,21 @@ function onMapClick(e) {
         .setContent('You clicked the map at ' + e.latlng.toString())
         .openOn(map);
 }
+function getVisibleMarkers() {
+    var markerList = [];
+    map.eachLayer(function(layer) {
+        if ((layer instanceof L.Marker) && (map.getBounds().contains(layer.getLatLng()))){
+            markerList.push(layer.getLatLng());
+        }
+    });
+    return markerList;
+}
 function resizeMap() {
     document.getElementById('map').style.width = window.screen.width.toString() + "px";
     document.getElementById('map').style.height = window.screen.height.toString() + "px";
     map.invalidateSize();
+    map.setBounds(getVisibleMarkers());
+    map.zoomOut();
 }
 map.on('click', onMapClick);
 
