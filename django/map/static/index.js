@@ -81,6 +81,7 @@ function onMapClick(e) {
 }
 function resizeMap() {
     document.getElementById('map').style.width = window.screen.width.toString() + "px";
+    document.getElementById('map').style.height = window.screen.height.toString() + "px";
     map.invalidateSize();
 }
 map.on('click', onMapClick);
