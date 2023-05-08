@@ -5,6 +5,14 @@ $(document).ready(function () {
     });
     addMarkersAndLines(groupData(live_storms));
     resizeMap();
+    fetchForecasts().then(data => {
+	  if (data) {
+	    console.log('Forecasts data:', data);
+	    createForecastMarkers(data);
+	  } else {
+	    console.log('Failed to fetch forecasts data.');
+	  }
+    });
 });
 function groupData(data) {
   const result = {};
@@ -20,6 +28,47 @@ function groupData(data) {
     result[id].sort((a, b) => b.time - a.time); // sort the storm data by timestamp in descending order
   });
   return result;
+}
+function fetchForecasts() {
+  try {
+    const response = await fetch('http://fluids.ai:1337/forecasts');
+
+    // Check if the request was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    // Parse the response as JSON
+    const jsonData = await response.json();
+    return jsonData;
+  } catch (error) {
+    console.error('Error fetching forecasts:', error);
+    return null;
+  }
+}
+function createForecastMarkers(forecasts) {
+  const markers = [];
+  const latlngs = [];
+
+  forecasts.forEach(forecast => {
+    const latLng = new L.LatLng(forecast.lat, forecast.lon);
+    const marker = L.marker(latLng).addTo(map);
+
+    // Bind tooltip to the marker
+    marker.bindTooltip(`
+      <strong>ID:</strong> ${forecast.id}<br>
+      <strong>Time:</strong> ${forecast.time}<br>
+      <strong>Latitude:</strong> ${forecast.lat}<br>
+      <strong>Longitude:</strong> ${forecast.lon}<br>
+      <strong>Wind Speed:</strong> ${forecast.wind_speed} knots
+    `);
+
+    markers.push(marker);
+    latlngs.push(latLng);
+  });
+
+  // Create and add the polyline to the map
+  const polyline = L.polyline(latlngs, { color: 'pink' }).addTo(map);
 }
 function addMarkersAndLines(groupedData) {
     // create an empty array to hold the polyline latlngs
