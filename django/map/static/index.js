@@ -68,6 +68,7 @@ function createForecastMarkers(forecasts) {
 
       // Bind tooltip to the marker
       marker.bindTooltip(`
+        <strong>Model:</strong> ChatGPT 3.5<br>
         <strong>ID:</strong> ${forecast.id}<br>
         <strong>Time:</strong> ${forecast.time}<br>
         <strong>Latitude:</strong> ${forecast.lat}<br>
