@@ -29,7 +29,7 @@ function groupData(data) {
   });
   return result;
 }
-function fetchForecasts() {
+async function fetchForecasts() {
   try {
     const response = await fetch('http://fluids.ai:1337/forecasts');
 
