@@ -48,28 +48,42 @@ async function fetchForecasts() {
 }
 function createForecastMarkers(forecasts) {
   const markers = [];
-  const latlngs = [];
+  const groupedForecasts = {};
 
+  // Group forecasts by storm ID
   forecasts.forEach(forecast => {
-    const latLng = new L.LatLng(forecast.lat, forecast.lon);
-    const marker = L.marker(latLng).addTo(map);
-
-    // Bind tooltip to the marker
-    marker.bindTooltip(`
-      <strong>ID:</strong> ${forecast.id}<br>
-      <strong>Time:</strong> ${forecast.time}<br>
-      <strong>Latitude:</strong> ${forecast.lat}<br>
-      <strong>Longitude:</strong> ${forecast.lon}<br>
-      <strong>Wind Speed:</strong> ${forecast.wind_speed} knots
-    `);
-
-    markers.push(marker);
-    latlngs.push(latLng);
+    if (!groupedForecasts[forecast.id]) {
+      groupedForecasts[forecast.id] = [];
+    }
+    groupedForecasts[forecast.id].push(forecast);
   });
 
-  // Create and add the polyline to the map
-  const polyline = L.polyline(latlngs, { color: 'pink' }).addTo(map);
+  // Iterate through each storm ID group
+  Object.keys(groupedForecasts).forEach(stormId => {
+    const latlngs = [];
+
+    groupedForecasts[stormId].forEach(forecast => {
+      const latLng = new L.LatLng(forecast.lat, forecast.lon);
+      const marker = L.marker(latLng).addTo(map);
+
+      // Bind tooltip to the marker
+      marker.bindTooltip(`
+        <strong>ID:</strong> ${forecast.id}<br>
+        <strong>Time:</strong> ${forecast.time}<br>
+        <strong>Latitude:</strong> ${forecast.lat}<br>
+        <strong>Longitude:</strong> ${forecast.lon}<br>
+        <strong>Wind Speed:</strong> ${forecast.wind_speed} knots
+      `);
+
+      markers.push(marker);
+      latlngs.push(latLng);
+    });
+
+    // Create and add the polyline to the map for the current storm ID group
+    const polyline = L.polyline(latlngs, { color: 'pink' }).addTo(map);
+  });
 }
+
 function addMarkersAndLines(groupedData) {
     // create an empty array to hold the polyline latlngs
     const polylineLatLngs = [];
