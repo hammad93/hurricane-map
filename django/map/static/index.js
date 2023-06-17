@@ -130,7 +130,14 @@ function addMarkersAndLines(groupedData) {
           // add a marker to the map with the calculated opacity
           const marker = L.marker([storm.lat, storm.lon], {
 		  'zIndexOffset': opacity * 100,
-		  'icon': L.icon({'iconUrl': `static/${category}.png`})
+		  'icon': L.icon({
+			    'iconUrl': `static/${category}.png`,
+			    'iconSize': [38, 95], // size of the icon
+			    'shadowSize': [50, 64], // size of the shadow
+			    'iconAnchor': [22, 94], // point of the icon which will correspond to marker's location
+			    'shadowAnchor': [4, 62],  // the same for the shadow
+			    'popupAnchor': [-3, -76] // point from which the popup should open relative to the iconAnchor
+		  })
 	  }).addTo(map);
     
           // set the marker tooltip content
