@@ -129,7 +129,7 @@ function addMarkersAndLines(groupedData) {
 	  let category = hurricaneCategory(parseFloat(storm.int));
           // add a marker to the map with the calculated opacity
           const marker = L.marker([storm.lat, storm.lon], {
-		  'zIndexOffset': opacity * 100,
+		  'zIndexOffset': opacity * 1000,
 		  'icon': L.icon({
 			    'iconUrl': `static/${category}.png`,
 			    'iconSize': [75, 75], // size of the icon
