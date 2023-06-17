@@ -46,6 +46,23 @@ async function fetchForecasts() {
     return null;
   }
 }
+function getColorCode(knots) {
+    if (knots < 34) {
+        return "#008000"; // Tropical Depression - Green
+    } else if (knots >= 34 && knots <= 63) {
+        return "#0000FF"; // Tropical Storm - Blue
+    } else if (knots >= 64 && knots <= 82) {
+        return "#FFFF00"; // Category 1 - Yellow
+    } else if (knots >= 83 && knots <= 95) {
+        return "#FFA500"; // Category 2 - Orange
+    } else if (knots >= 96 && knots <= 112) {
+        return "#FF0000"; // Category 3 - Red
+    } else if (knots >= 113 && knots <= 135) {
+        return "#800080"; // Category 4 - Purple
+    } else {
+        return "#800000"; // Category 5 - Maroon
+    }
+}
 function createForecastMarkers(forecasts) {
   const markers = [];
   const groupedForecasts = {};
@@ -146,9 +163,11 @@ function addMarkersAndLines(groupedData) {
         polylineLatLngs.push([storm.lat, storm.lon]);
         
         // add a circle to the map with the calculated opacity
-        const circle = L.circle([storm.lat, storm.lon], {
+        let circleColor = getColorCode(parseFloat(storm.int));
+	const circle = L.circle([storm.lat, storm.lon], {
           'opacity': opacity,
           'zIndexOffset': opacity * 100,
+	  'color': circleColor,
           'radius': 100000 // specify the radius of the circle in meters
         }).addTo(map);
       });
