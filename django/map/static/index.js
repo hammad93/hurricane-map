@@ -85,6 +85,23 @@ function createForecastMarkers(forecasts) {
   });
 }
 
+function hurricaneCategory(knots) {
+    // Calculate the category based on knots
+    if(knots < 64) {
+        return null;
+    } else if(knots <= 82) {
+        return 'cat1';
+    } else if(knots <= 95) {
+        return 'cat2';
+    } else if(knots <= 113) {
+        return 'cat3';
+    } else if(knots <= 136) {
+        return 'cat4';
+    } else {
+        return 'cat5';
+    }
+}
+
 function addMarkersAndLines(groupedData) {
     // create an empty array to hold the polyline latlngs
     const polylineLatLngs = [];
