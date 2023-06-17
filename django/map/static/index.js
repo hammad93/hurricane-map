@@ -125,8 +125,13 @@ function addMarkersAndLines(groupedData) {
 	
         // record is less than 5 days old from the most recent time
         if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
+	  // calculate category and get the icon
+	  let category = hurricaneCategory(storm.wind_speed);
           // add a marker to the map with the calculated opacity
-          const marker = L.marker([storm.lat, storm.lon], {'zIndexOffset': opacity * 100}).addTo(map);
+          const marker = L.marker([storm.lat, storm.lon], {
+		  'zIndexOffset': opacity * 100,
+		  'icon': L.icon({'iconUrl': `${category}.png`})
+	  }).addTo(map);
     
           // set the marker tooltip content
           marker.setOpacity(opacity);
