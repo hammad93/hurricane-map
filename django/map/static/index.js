@@ -133,7 +133,7 @@ function addMarkersAndLines(groupedData) {
 		  'icon': L.icon({
 			    'iconUrl': `static/${category}.png`,
 			    'iconSize': [33, 33], // size of the icon
-			    'iconAnchor': [0, 33], // point of the icon which will correspond to marker's location
+			    'iconAnchor': [22, 33], // point of the icon which will correspond to marker's location
 			    'popupAnchor': [-3, -76] // point from which the popup should open relative to the iconAnchor
 		  })
 	  }).addTo(map);
