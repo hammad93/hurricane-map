@@ -88,7 +88,7 @@ function createForecastMarkers(forecasts) {
 function hurricaneCategory(knots) {
     // Calculate the category based on knots
     if(knots < 64) {
-        return null;
+        return 'storm';
     } else if(knots <= 82) {
         return 'cat1';
     } else if(knots <= 95) {
@@ -132,7 +132,7 @@ function addMarkersAndLines(groupedData) {
 		  'zIndexOffset': opacity * 1000,
 		  'icon': L.icon({
 			    'iconUrl': `static/${category}.png`,
-			    'iconSize': [75, 75], // size of the icon
+			    'iconSize': [33, 33], // size of the icon
 			    'iconAnchor': [22, 94], // point of the icon which will correspond to marker's location
 			    'popupAnchor': [-3, -76] // point from which the popup should open relative to the iconAnchor
 		  })
