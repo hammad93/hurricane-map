@@ -122,61 +122,75 @@ function hurricaneCategory(knots) {
 function addMarkersAndLines(groupedData) {
     // create an empty array to hold the polyline latlngs
     const polylineLatLngs = [];
-  
+
     // loop through each storm id in the grouped data
     for (const id in groupedData) {
-      // get the array of storm objects for this id
-      const storms = groupedData[id];
-  
-      // determine the most recent time for this group
-      const mostRecentTime = Math.max(...storms.map(storm => storm.time));
-  
-      // loop through each storm object in the array
-      storms.forEach((storm, index) => {
-        // calculate the opacity based on the time difference from the most recent time
-        const timeDiff = mostRecentTime - storm.time;
-        var opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60 * 1000))); // 6 days
-        if (index > 0) { // everything after the most recent should be more obvious
-	  opacity = Math.max(0, opacity - 0.25);
-	}
-	
-        // record is less than 5 days old from the most recent time
-        if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
-	  // calculate category and get the icon
-	  let category = hurricaneCategory(parseFloat(storm.int));
-          // add a marker to the map with the calculated opacity
-          const marker = L.marker([storm.lat, storm.lon], {
-		  'zIndexOffset': opacity * 1000,
-		  'icon': L.icon({
-			    'iconUrl': `static/${category}.png`,
-			    'iconSize': [33, 33], // size of the icon
-			    'iconAnchor': [22, 33], // point of the icon which will correspond to marker's location
-			    'popupAnchor': [-3, -76] // point from which the popup should open relative to the iconAnchor
-		  })
-	  }).addTo(map);
-    
-          // set the marker tooltip content
-          marker.setOpacity(opacity);
-          marker.bindTooltip(`ID: ${id}<br>Time: ${new Date(storm.time)}`);
+        // get the array of storm objects for this id
+        const storms = groupedData[id];
+
+        // determine the most recent time for this group
+        const mostRecentTime = Math.max(...storms.map(storm => storm.time));
+
+        // Initialize lastLongitude with the first storm's longitude for checking International Date Line crossings
+        let lastLongitude = storms[0].lon;
+
+        // loop through each storm object in the array
+        storms.forEach((storm, index) => {
+            // calculate the opacity based on the time difference from the most recent time
+            const timeDiff = mostRecentTime - storm.time;
+            var opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60 * 1000))); // 6 days
+            if (index > 0) {
+                opacity = Math.max(0, opacity - 0.25);
+            }
+
+            // Check if we have crossed the International Date Line
+            if (Math.abs(storm.lon - lastLongitude) > 180) {
+                // If a crossing is detected, draw the accumulated polylineLatLngs up to that point
+                L.polyline(polylineLatLngs, { color: 'red' }).addTo(map);
+
+                // Clear the accumulated points to start a new segment of the storm's path
+                polylineLatLngs.length = 0;
+            }
+
+            // Update the lastLongitude for the next iteration
+            lastLongitude = storm.lon;
+
+            if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
+                let category = hurricaneCategory(parseFloat(storm.int));
+
+                const marker = L.marker([storm.lat, storm.lon], {
+                    'zIndexOffset': opacity * 1000,
+                    'icon': L.icon({
+                        'iconUrl': `static/${category}.png`,
+                        'iconSize': [33, 33],
+                        'iconAnchor': [22, 33],
+                        'popupAnchor': [-3, -76]
+                    })
+                }).addTo(map);
+
+                marker.setOpacity(opacity);
+                marker.bindTooltip(`ID: ${id}<br>Time: ${new Date(storm.time)}`);
+            }
+
+            // add the marker latlng to the polyline latlngs array
+            polylineLatLngs.push([storm.lat, storm.lon]);
+
+            let circleColor = getColorCode(parseFloat(storm.int));
+            const circle = L.circle([storm.lat, storm.lon], {
+                'opacity': opacity,
+                'zIndexOffset': opacity * 100,
+                'color': circleColor,
+                'radius': 100000
+            }).addTo(map);
+        });
+
+        // After iterating through all storms for a given id, add a polyline for any remaining points
+        if (polylineLatLngs.length > 0) {
+            L.polyline(polylineLatLngs, { color: 'red' }).addTo(map);
         }
-        // add the marker latlng to the polyline latlngs array
-        polylineLatLngs.push([storm.lat, storm.lon]);
-        
-        // add a circle to the map with the calculated opacity
-        let circleColor = getColorCode(parseFloat(storm.int));
-	const circle = L.circle([storm.lat, storm.lon], {
-          'opacity': opacity,
-          'zIndexOffset': opacity * 100,
-	  'color': circleColor,
-          'radius': 100000 // specify the radius of the circle in meters
-        }).addTo(map);
-      });
-  
-      // add a polyline to the map
-      L.polyline(polylineLatLngs, { color: 'red' }).addTo(map);
-  
-      // reset the polyline latlngs array for the next storm id
-      polylineLatLngs.length = 0;
+
+        // reset the polyline latlngs array for the next storm id
+        polylineLatLngs.length = 0;
     }
 }
 
