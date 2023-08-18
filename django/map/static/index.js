@@ -85,8 +85,8 @@ function createForecastMarkers(forecasts) {
                     'opacity': 0.5,
                     'icon': L.icon({
                         'iconUrl': `static/forecast.png`,
-                        'iconSize': [25, 25],
-                        'iconAnchor': [25, 25],
+                        'iconSize': [33, 33],
+                        'iconAnchor': [22, 33],
                         'popupAnchor': [-3, -76]
                     })
                 }).addTo(map);
