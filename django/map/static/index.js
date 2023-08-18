@@ -82,7 +82,7 @@ function createForecastMarkers(forecasts) {
     groupedForecasts[stormId].forEach(forecast => {
       const latLng = new L.LatLng(forecast.lat, forecast.lon);
       const marker = L.marker(latLng, {
-                    'zIndexOffset': opacity * 1000,
+                    'zIndexOffset': 1000,
                     'icon': L.icon({
                         'iconUrl': `static/forecast.png`,
                         'iconSize': [15, 15],
