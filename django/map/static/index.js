@@ -82,11 +82,11 @@ function createForecastMarkers(forecasts) {
     groupedForecasts[stormId].forEach(forecast => {
       const latLng = new L.LatLng(forecast.lat, forecast.lon);
       const marker = L.marker(latLng, {
-                    'zIndexOffset': 1000,
+                    'opacity': 0.5,
                     'icon': L.icon({
                         'iconUrl': `static/forecast.png`,
-                        'iconSize': [15, 15],
-                        'iconAnchor': [22, 33],
+                        'iconSize': [25, 25],
+                        'iconAnchor': [-3, -76],
                         'popupAnchor': [-3, -76]
                     })
                 }).addTo(map);
@@ -106,7 +106,7 @@ function createForecastMarkers(forecasts) {
     });
 
     // Create and add the polyline to the map for the current storm ID group
-    const polyline = L.polyline(latlngs, { color: 'pink' }).addTo(map);
+    const polyline = L.polyline(latlngs, { color: 'red', opacity: 0.5 }).addTo(map);
   });
 }
 
