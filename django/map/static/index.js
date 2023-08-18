@@ -81,7 +81,15 @@ function createForecastMarkers(forecasts) {
 
     groupedForecasts[stormId].forEach(forecast => {
       const latLng = new L.LatLng(forecast.lat, forecast.lon);
-      const marker = L.marker(latLng).addTo(map);
+      const marker = L.marker(latLng, {
+                    'zIndexOffset': opacity * 1000,
+                    'icon': L.icon({
+                        'iconUrl': `static/forecast.png`,
+                        'iconSize': [15, 15],
+                        'iconAnchor': [22, 33],
+                        'popupAnchor': [-3, -76]
+                    })
+                }).addTo(map);
 
       // Bind tooltip to the marker
       marker.bindTooltip(`
