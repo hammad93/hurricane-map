@@ -81,15 +81,15 @@ function createForecastMarkers(forecasts) {
 
     groupedForecasts[stormId].forEach(forecast => {
       const latLng = new L.LatLng(forecast.lat, forecast.lon);
-      const marker = L.marker(latLng, {
-                    'opacity': 0.5,
-                    'icon': L.icon({
-                        'iconUrl': `static/forecast.png`,
-                        'iconSize': [33, 33],
-                        'iconAnchor': [22, 33],
-                        'popupAnchor': [-3, -76]
-                    })
-                }).addTo(map);
+      const circleMarker = L.circleMarker([storm.lat, storm.lon], {
+	    radius: 5, // Adjust this to your desired size
+	    fillColor: "#FFFFFF",
+	    color: "#FFFFFF", // The color of the circle outline
+	    weight: 1, // The width of the circle outline
+	    opacity: 1,
+	    fillOpacity: 1.0, // Fill opacity
+	    zIndexOffset: 1000
+      }).addTo(map);
 
       // Bind tooltip to the marker
       marker.bindTooltip(`
