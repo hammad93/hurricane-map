@@ -81,7 +81,7 @@ function createForecastMarkers(forecasts) {
 
     groupedForecasts[stormId].forEach(forecast => {
       const latLng = new L.LatLng(forecast.lat, forecast.lon);
-      const circleMarker = L.circleMarker(latLng, {
+      const marker = L.circleMarker(latLng, {
 	    radius: 5, // Adjust this to your desired size
 	    fillColor: "#FFFFFF",
 	    color: "#FFFFFF", // The color of the circle outline
