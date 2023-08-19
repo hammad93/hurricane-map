@@ -50,17 +50,17 @@ function getColorCode(knots) {
     if (knots < 34) {
         return "#008000"; // Tropical Depression - Green
     } else if (knots >= 34 && knots <= 63) {
-        return "#0000FF"; // Tropical Storm - Blue
+        return "#FFFF00"; // Tropical Storm - Yellow
     } else if (knots >= 64 && knots <= 82) {
-        return "#FFFF00"; // Category 1 - Yellow
+        return "#FFC0C0"; // Category 1 - Light Red
     } else if (knots >= 83 && knots <= 95) {
-        return "#FFA500"; // Category 2 - Orange
+        return "#FF8080"; // Category 2 - Medium Light Red
     } else if (knots >= 96 && knots <= 112) {
-        return "#FF0000"; // Category 3 - Red
+        return "#FF4040"; // Category 3 - Medium Red
     } else if (knots >= 113 && knots <= 135) {
-        return "#800080"; // Category 4 - Purple
+        return "#FF0000"; // Category 4 - Dark Red
     } else {
-        return "#800000"; // Category 5 - Maroon
+        return "#8B0000"; // Category 5 - Very Dark Red
     }
 }
 function createForecastMarkers(forecasts) {
