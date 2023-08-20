@@ -37,12 +37,12 @@ function addImageryAroundStormCenter(groupedData) {
             ];
 
             const maskRadius = 0.5;  // Radius in degrees.
-            const mask = [
-                [mostRecentStorm.lat - maskRadius, mostRecentStorm.lon - maskRadius],
-                [mostRecentStorm.lat - maskRadius, mostRecentStorm.lon + maskRadius],
-                [mostRecentStorm.lat + maskRadius, mostRecentStorm.lon + maskRadius],
-                [mostRecentStorm.lat + maskRadius, mostRecentStorm.lon - maskRadius]
-            ];
+	    const mask = [
+		    [parseFloat(mostRecentStorm.lat) - maskRadius, parseFloat(mostRecentStorm.lon) - maskRadius],
+		    [parseFloat(mostRecentStorm.lat) - maskRadius, parseFloat(mostRecentStorm.lon) + maskRadius],
+		    [parseFloat(mostRecentStorm.lat) + maskRadius, parseFloat(mostRecentStorm.lon) + maskRadius],
+		    [parseFloat(mostRecentStorm.lat) + maskRadius, parseFloat(mostRecentStorm.lon) - maskRadius]
+		];
 
             masks[stormId] = L.polygon([outerBounds, mask], {
                 color: 'black',
