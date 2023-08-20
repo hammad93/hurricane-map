@@ -14,6 +14,61 @@ $(document).ready(function () {
 	  }
     });
 });
+let wmtsLayer = null;  // Global variable to hold the WMTS layer reference
+let masks = {}; // Store each mask associated with a storm's id
+function addImageryAroundStormCenter(groupedData) {
+    for (const stormId in groupedData) {
+        const storms = groupedData[stormId];
+        const mostRecentTime = Math.max(...storms.map(storm => storm.time));
+        const mostRecentStorm = storms.find(storm => storm.time === mostRecentTime);
+
+        if (mostRecentStorm) {
+            // Remove the old mask for this storm if it exists
+            if (masks[stormId]) {
+                map.removeLayer(masks[stormId]);
+            }
+
+            // Create a mask for the most recent time of the current storm
+            const outerBounds = [
+                [-90, -180],
+                [-90, 180],
+                [90, 180],
+                [90, -180]
+            ];
+
+            const maskRadius = 0.5;  // Radius in degrees.
+            const mask = [
+                [mostRecentStorm.lat - maskRadius, mostRecentStorm.lon - maskRadius],
+                [mostRecentStorm.lat - maskRadius, mostRecentStorm.lon + maskRadius],
+                [mostRecentStorm.lat + maskRadius, mostRecentStorm.lon + maskRadius],
+                [mostRecentStorm.lat + maskRadius, mostRecentStorm.lon - maskRadius]
+            ];
+
+            masks[stormId] = L.polygon([outerBounds, mask], {
+                color: 'black',
+                fillColor: 'black',
+                fillOpacity: 0.7
+            }).addTo(map);
+
+            // Update the WMS imagery
+            const currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() - 1);
+            const prevDateISO = currentDate.toISOString();
+
+            const wmsUrlTemplate = `https://gitc-a.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?TIME=${prevDateISO}&layer=VIIRS_NOAA20_CorrectedReflectance_TrueColor&style=default&tilematrixset=250m&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}`;
+
+            // If the WMTS layer already exists, remove it from the map
+            if (wmtsLayer) {
+                map.removeLayer(wmtsLayer);
+            }
+
+            // Create a new WMTS layer and add it to the map
+            wmtsLayer = L.tileLayer(wmsUrlTemplate, {
+                attribution: "NASA"
+            }).addTo(map);
+        }
+    }
+}
 function groupData(data) {
   const result = {};
   data.forEach(item => {
@@ -130,7 +185,6 @@ function hurricaneCategory(knots) {
 function addMarkersAndLines(groupedData) {
     // create an empty array to hold the polyline latlngs
     const polylineLatLngs = [];
-
     // loop through each storm id in the grouped data
     for (const id in groupedData) {
         // get the array of storm objects for this id
@@ -200,6 +254,8 @@ function addMarkersAndLines(groupedData) {
         // reset the polyline latlngs array for the next storm id
         polylineLatLngs.length = 0;
     }
+    // Call the imagery function for the entire groupedData
+    addImageryAroundStormCenter(groupedData);
 }
 
 var map = L.map('map').setView([0, 0], 2);
