@@ -202,9 +202,11 @@ function addMarkersAndLines(groupedData) {
 }
 
 var map = L.map('map').setView([0, 0], 2);
-// Calculate yesterday's date in ISO 8601 format
-const yesterday = new Date(Date.now() - 86400000); // 86400000 milliseconds in a day
-const isoDate = yesterday.toISOString();
+
+// Calculate yesterday's date and set time to "00:00:00Z"
+const yesterday = new Date(Date.now() - 86400000);  // 86400000 milliseconds in a day
+yesterday.setUTCHours(0, 0, 0, 0);
+const isoDate = yesterday.toISOString().split('T')[0] + "T00:00:00Z";
 
 const nasaWMTSURL = `https://gitc-a.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?TIME=${isoDate}&layer=VIIRS_NOAA20_CorrectedReflectance_TrueColor&style=default&tilematrixset=250m&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}`;
 
