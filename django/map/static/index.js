@@ -202,10 +202,24 @@ function addMarkersAndLines(groupedData) {
 }
 
 var map = L.map('map').setView([0, 0], 2);
+// Calculate yesterday's date in ISO 8601 format
+const yesterday = new Date(Date.now() - 86400000); // 86400000 milliseconds in a day
+const isoDate = yesterday.toISOString();
+
+const nasaWMTSURL = `https://gitc-a.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?TIME=${isoDate}&layer=VIIRS_NOAA20_CorrectedReflectance_TrueColor&style=default&tilematrixset=250m&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}`;
+
+var nasaWMTS = L.tileLayer(nasaWMTSURL, {
+    maxZoom: 19
+}).addTo(map);  // This becomes the base layer
+
 var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    maxZoom: 19,
+    opacity: 0.7,  // Set OSM layer opacity to 0.7
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
+OpenStreetMap_Mapnik.bringToFront();  // Ensure the OSM layer is always on top
+
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
