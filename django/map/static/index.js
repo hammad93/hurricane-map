@@ -206,7 +206,7 @@ var map = L.map('map').setView([0, 0], 2);
 const today = new Date();
 const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1); // Subtract 1 day from current day
 const isoDate = yesterday.toISOString().split('T')[0] + "T00:00:00Z";
-const nasaWMTSURL = `https://gitc-a.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?TIME=${isoDate}&layer=VIIRS_NOAA20_CorrectedReflectance_TrueColor&style=default&tilematrixset=250m&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}`;
+const nasaWMTSURL = `https://gitc-a.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?TIME=${isoDate}&layer=VIIRS_NOAA20_CorrectedReflectance_TrueColor&style=default&tilematrixset=GoogleMapsCompatible_Level9&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/jpeg&TileMatrix={z}&TileCol={x}&TileRow={y}`;
 var nasaWMTS = L.tileLayer(nasaWMTSURL, {
     maxZoom: 19
 }).addTo(map);  // This becomes the base layer
