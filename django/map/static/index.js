@@ -66,6 +66,7 @@ function getColorCode(knots) {
 function createForecastMarkers(forecasts) {
   const markers = [];
   const groupedForecasts = {};
+  const forecastLine = { color: 'red', opacity: 0.5 };
 
   // Group forecasts by storm ID
   forecasts.forEach(forecast => {
@@ -79,9 +80,10 @@ function createForecastMarkers(forecasts) {
   Object.keys(groupedForecasts).forEach(stormId => {
     const latlngs = [];
 
-    groupedForecasts[stormId].forEach(forecast => {
-      const latLng = new L.LatLng(forecast.lat, forecast.lon);
-      const marker = L.circleMarker(latLng, {
+    groupedForecasts[stormId].forEach((forecast, index, self) => {
+      let latLng = new L.LatLng(forecast.lat, forecast.lon);
+      let prevForecast = self[index - 1];
+      let marker = L.circleMarker(latLng, {
 	    radius: 5, // Adjust this to your desired size
 	    fillColor: "#FFFFFF",
 	    color: "#FFFFFF", // The color of the circle outline
@@ -90,6 +92,15 @@ function createForecastMarkers(forecasts) {
 	    fillOpacity: 1.0, // Fill opacity
 	    zIndexOffset: 1000
       }).addTo(map);
+
+      if (prevForecast) {
+        if (Math.abs(prevForecast.lon - forecast.lon) > 180) {
+          // This means we crossed the International Date Line
+          // First, complete the existing polyline
+          L.polyline(latlngs, forecastLine).addTo(map);
+          latlngs = [];
+        }
+      }
 
       // Bind tooltip to the marker
       marker.bindTooltip(`
@@ -106,7 +117,7 @@ function createForecastMarkers(forecasts) {
     });
 
     // Create and add the polyline to the map for the current storm ID group
-    const polyline = L.polyline(latlngs, { color: 'red', opacity: 0.5 }).addTo(map);
+    const polyline = L.polyline(latlngs, forecastLine).addTo(map);
   });
 }
 
