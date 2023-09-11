@@ -68,56 +68,62 @@ function createForecastMarkers(forecasts) {
   const groupedForecasts = {};
   const forecastLine = { color: 'red', opacity: 0.5 };
 
-  // Group forecasts by storm ID
+  // Group forecasts by model and then by storm ID
   forecasts.forEach(forecast => {
-    if (!groupedForecasts[forecast.id]) {
-      groupedForecasts[forecast.id] = [];
+    if (!groupedForecasts[forecast.model]) {
+      groupedForecasts[forecast.model] = {};
     }
-    groupedForecasts[forecast.id].push(forecast);
+    if (!groupedForecasts[forecast.model][forecast.id]) {
+      groupedForecasts[forecast.model][forecast.id] = [];
+    }
+    groupedForecasts[forecast.model][forecast.id].push(forecast);
   });
 
-  // Iterate through each storm ID group
-  Object.keys(groupedForecasts).forEach(stormId => {
-    const latlngs = [];
+  // Iterate through each model
+  Object.keys(groupedForecasts).forEach(model => {
+    // Iterate through each storm ID within the model
+    Object.keys(groupedForecasts[model]).forEach(stormId => {
+      const latlngs = [];
 
-    groupedForecasts[stormId].forEach((forecast, index, self) => {
-      let latLng = new L.LatLng(forecast.lat, forecast.lon);
-      let prevForecast = self[index - 1];
-      let marker = L.circleMarker(latLng, {
-	    radius: 5, // Adjust this to your desired size
-	    fillColor: "#FFFFFF",
-	    color: "#FFFFFF", // The color of the circle outline
-	    weight: 1, // The width of the circle outline
-	    opacity: 1,
-	    fillOpacity: 1.0, // Fill opacity
-	    zIndexOffset: 1000
-      }).addTo(map);
+      groupedForecasts[model][stormId].forEach((forecast, index, self) => {
+        let latLng = new L.LatLng(forecast.lat, forecast.lon);
+        let prevForecast = self[index - 1];
+        let marker = L.circleMarker(latLng, {
+          radius: 5,
+          fillColor: "#FFFFFF",
+          color: "#FFFFFF",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 1.0,
+          zIndexOffset: 1000
+        }).addTo(map);
 
-      if (prevForecast) {
-        if (Math.abs(prevForecast.lon - forecast.lon) > 180) {
-          // This means we crossed the International Date Line
-          // First, complete the existing polyline
-          L.polyline(latlngs, forecastLine).addTo(map);
-          latlngs = [];
+        if (prevForecast) {
+          if (Math.abs(prevForecast.lon - forecast.lon) > 180) {
+            // This means we crossed the International Date Line
+            // First, complete the existing polyline
+            L.polyline(latlngs, forecastLine).addTo(map);
+            latlngs = [];
+          }
         }
-      }
 
-      // Bind tooltip to the marker
-      marker.bindTooltip(`
-        <strong>Model:</strong>${forecast.model}<br>
-        <strong>ID:</strong> ${forecast.id}<br>
-        <strong>Time:</strong> ${forecast.time}<br>
-        <strong>Latitude:</strong> ${forecast.lat}<br>
-        <strong>Longitude:</strong> ${forecast.lon}<br>
-        <strong>Wind Speed:</strong> ${forecast.wind_speed} knots
-      `);
+        // Bind tooltip to the marker
+        marker.bindTooltip(`
+          <strong>Model:</strong>${forecast.model}<br>
+          <strong>ID:</strong> ${forecast.id}<br>
+          <strong>Time:</strong> ${forecast.time}<br>
+          <strong>Latitude:</strong> ${forecast.lat}<br>
+          <strong>Longitude:</strong> ${forecast.lon}<br>
+          <strong>Wind Speed:</strong> ${forecast.wind_speed} knots
+        `);
 
-      markers.push(marker);
-      latlngs.push(latLng);
+        markers.push(marker);
+        latlngs.push(latLng);
+      });
+
+      // Create and add the polyline to the map for the current storm ID group
+      const polyline = L.polyline(latlngs, forecastLine).addTo(map);
     });
-
-    // Create and add the polyline to the map for the current storm ID group
-    const polyline = L.polyline(latlngs, forecastLine).addTo(map);
   });
 }
 
