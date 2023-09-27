@@ -195,9 +195,38 @@ function addMarkersAndLines(groupedData) {
                         'popupAnchor': [-3, -76]
                     })
                 }).addTo(map);
-
+		// Convert wind speed from knots to mph and kmh
+		const windSpeedMph = (storm.int * 1.15078).toFixed(2); // rounded to 2 decimal places for clarity
+		const windSpeedKmh = (storm.int * 1.852).toFixed(2); 
+		
+		// Derive the storm category based on the Saffir-Simpson scale
+		let stormCategory;
+		if (storm.int < 34) {
+		    stormCategory = "Tropical Depression";
+		} else if (storm.int < 64) {
+		    stormCategory = "Tropical Storm";
+		} else if (storm.int < 83) {
+		    stormCategory = "Category 1";
+		} else if (storm.int < 96) {
+		    stormCategory = "Category 2";
+		} else if (storm.int < 113) {
+		    stormCategory = "Category 3";
+		} else if (storm.int < 137) {
+		    stormCategory = "Category 4";
+		} else {
+		    stormCategory = "Category 5";
+		}
+		
+		// Update the marker tooltip
+		marker.bindTooltip(`
+		    ID: ${storm.id}<br>
+		    Time: ${new Date(storm.time).toLocaleString()}<br>
+		    Latitude: ${storm.lat}<br>
+		    Longitude: ${storm.lon}<br>
+		    Wind Speed: ${storm.int} knots (${windSpeedMph} mph / ${windSpeedKmh} kmh)<br>
+		    Category: ${stormCategory}
+		`);
                 marker.setOpacity(opacity);
-                marker.bindTooltip(`ID: ${id}<br>Time: ${new Date(storm.time)}`);
             }
 
             // add the marker latlng to the polyline latlngs array
