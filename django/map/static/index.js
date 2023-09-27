@@ -40,12 +40,16 @@ async function fetchForecasts() {
 
     // Parse the response as JSON
     const jsonData = await response.json();
-    return jsonData;
+
+    // Filter out the models that are defined as 'gpt-3.5-turbo'
+    const filteredData = jsonData.filter(item => item.model !== 'gpt-3.5-turbo');
+    return filteredData;
   } catch (error) {
     console.error('Error fetching forecasts:', error);
     return null;
   }
 }
+
 function getColorCode(knots) {
     if (knots < 34) {
         return "#008000"; // Tropical Depression - Green
