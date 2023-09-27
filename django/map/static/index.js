@@ -208,7 +208,7 @@ function addMarkersAndLines(groupedData) {
                 'opacity': opacity,
                 'zIndexOffset': opacity * 100,
                 'color': circleColor,
-                'radius': 100000
+                'radius': 100000 * 2 // twice the avg radius 
             }).addTo(map);
         });
 
