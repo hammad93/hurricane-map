@@ -5,13 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+      content="width=device-width, initial-scale=1"
     />
     <title>hurricane-map 3D</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.111.0/Cesium.js" integrity="sha512-VjMfxVEXtb4RIAA9CZZaAmxzWGHBU/CAAiSn/mJ47qClQzhtWo//gnPV0otnVL9TflseucJNvU5v6aryqByAsw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   </head>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
     .cesium-viewer-animationContainer {
       display: none;
     }
@@ -23,7 +27,7 @@
     }
   </style>
   <body>
-  <div id="cesiumContainer" style="width: 100vw; height: 100vh;"></div>
+  <div id="cesiumContainer" style="width: 100vw; height: 100vh"></div>
   </body>
   <script>
   window.startup = async function (Cesium) {
