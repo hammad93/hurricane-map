@@ -201,32 +201,57 @@
         return 'cat5';
     }
   }
+  function unixSeconds(timestamp) {
+    return Math.floor(new Date(timestamp).getTime() / 1000);
+  }
   function plotStorms(groupedData, viewer) {
     Object.values(groupedData).forEach(storms => {
         const positions = [];
-        storms.forEach(storm => {
-            const position = Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat);
-            positions.push(position);
-
+        // determine the most recent time for this group
+        const mostRecentTime = Math.max(...storms.map(storm => unixSeconds(storm.time)));
+        console.log(`${storms[0].id} most recent time unix: ${mostRecentTime}`)
+        storms.forEach((storm, index) => {
+            // calculate the opacity based on the time difference from the most recent time
+            const timeDiff = mostRecentTime - unixSeconds(storm.time);
+            var opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
+            if (timeDiff > 0) {
+                opacity = Math.max(0, opacity - 0.25);
+            }
+            console.log(`${storm.id} at ${storm.time} opacity: ${opacity}`)
+            
             // Add a marker for each storm point
+            positions.push(position);
             viewer.entities.add({
-                position: position,
+                position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (opacity * 100)),
                 point: {
                     pixelSize: 50,
                     color: Cesium.Color.fromCssColorString(
                         getColorCode(parseFloat(storm.wind_speed))
-                      ).withAlpha(0.8)
+                      ).withAlpha(opacity)
                 }
             });
 
             // Add a billboard as a marker for each storm point
             let category = saffirSimpsonCategory(parseFloat(storm.wind_speed));
             viewer.entities.add({
-                position: position,
+                position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (opacity * 1000)),
                 billboard: {
                     image: `static/${category}.png`,
+                    color: new Cesium.Color(1.0, 1.0, 1.0, opacity),
                     scaleByDistance: new Cesium.NearFarScalar(-5000, 0.2, 8000000, 0.02)
-                }
+                },
+                description: `
+                    <h4>Storm History</h4>
+                    <ul>
+                        <li><strong>Storm ID:</strong> ${storm.id}</li>
+                        <li><strong>Time:</strong> ${storm.time}</li>
+                        <li><strong>Latitude:</strong> ${storm.lat}</li>
+                        <li><strong>Longitude:</strong> ${storm.lon}</li>
+                        <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
+                        <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
+                        <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
+                    </ul>
+                `
             });
         });
         // Add a line to connect the storm points
