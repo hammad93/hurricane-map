@@ -213,32 +213,38 @@
         storms.forEach((storm, index) => {
             // calculate the opacity based on the time difference from the most recent time
             const timeDiff = mostRecentTime - unixSeconds(storm.time);
-            var opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
+            const level = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
+            var opacity = level;
             if (timeDiff > 0) {
-                opacity = Math.max(0, opacity - 0.25);
+                opacity = Math.max(0, level - 0.1);
             }
             console.log(`${storm.id} at ${storm.time} opacity: ${opacity}`)
             
             // Add a marker for each storm point
+            const position = Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 100))
             positions.push(position);
             viewer.entities.add({
-                position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (opacity * 100)),
+                position: position,
                 point: {
                     pixelSize: 50,
                     color: Cesium.Color.fromCssColorString(
                         getColorCode(parseFloat(storm.wind_speed))
-                      ).withAlpha(opacity)
+                      ).withAlpha(opacity),
+                    scaleByDistance: new Cesium.NearFarScalar(0, 5, 8000000, 1)  
                 }
             });
 
             // Add a billboard as a marker for each storm point
             let category = saffirSimpsonCategory(parseFloat(storm.wind_speed));
+            if (timeDiff > 0) {
+                opacity = Math.max(0, level - 0.25);
+            }
             viewer.entities.add({
-                position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (opacity * 1000)),
+                position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 10000)),
                 billboard: {
                     image: `static/${category}.png`,
                     color: new Cesium.Color(1.0, 1.0, 1.0, opacity),
-                    scaleByDistance: new Cesium.NearFarScalar(-5000, 0.2, 8000000, 0.02)
+                    scaleByDistance: new Cesium.NearFarScalar(0, 0.2, 8000000, 0)
                 },
                 description: `
                     <h4>Storm History</h4>
@@ -270,15 +276,15 @@
     } else if (knots >= 34 && knots <= 63) {
         return "#FFFF00"; // Tropical Storm - Yellow
     } else if (knots >= 64 && knots <= 82) {
-        return "#FFC0C0"; // Category 1 - Light Red
+        return "#ff8000"; // Category 1 - Orange
     } else if (knots >= 83 && knots <= 95) {
-        return "#FF8080"; // Category 2 - Medium Light Red
+        return "#FF4040"; // Category 2 -  Light Red
     } else if (knots >= 96 && knots <= 112) {
-        return "#FF4040"; // Category 3 - Medium Red
+        return "#FF0000"; // Category 3 - Medium Red
     } else if (knots >= 113 && knots <= 135) {
-        return "#FF0000"; // Category 4 - Dark Red
+        return "#b30000"; // Category 4 - Dark Red
     } else {
-        return "#8B0000"; // Category 5 - Very Dark Red
+        return "#b300b3"; // Category 5 - Fuchsia
     }
   }
   function findMostRecentEntries(groupedData) {
@@ -383,8 +389,7 @@
             let prevForecast = null;
 
             groupedForecasts[model][stormId].forEach(forecast => {
-                const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat);
-
+                const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 100000);
                 // Add a marker for each forecast point
                 viewer.entities.add({
                     position: position,
@@ -413,7 +418,7 @@
                         polyline: {
                             positions: positions,
                             width: 2,
-                            material: Cesium.Color.RED.withAlpha(0.5)
+                            material: Cesium.Color.FUCHSIA.withAlpha(0.8)
                         }
                     });
                     positions = [];
@@ -428,7 +433,7 @@
                     polyline: {
                         positions: positions,
                         width: 2,
-                        material: Cesium.Color.RED.withAlpha(0.5)
+                        material: Cesium.Color.FUCHSIA.withAlpha(0.8)
                     }
                 });
             }
