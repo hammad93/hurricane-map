@@ -153,6 +153,8 @@
         console.log('Forecasts data:', data);
         const groupedStorms = groupData(data);
         plotStorms(groupedStorms, viewer);
+        const strongestStorm = findHighestWindSpeedEntry(groupedStorms);
+        centerCameraOnLocation(viewer, strongestStorm.lat, strongestStorm.lon);
       } else {
         console.log('Failed to fetch forecasts data.');
       }
@@ -252,6 +254,62 @@
     } else {
         return "#8B0000"; // Category 5 - Very Dark Red
     }
+  }
+  function findMostRecentEntries(groupedData) {
+    const mostRecentEntries = {};
+
+    Object.keys(groupedData).forEach(stormId => {
+        let mostRecentEntry = null;
+        let mostRecentTime = 0;
+
+        groupedData[stormId].forEach(entry => {
+            const entryTime = new Date(entry.time).getTime(); // Assuming 'time' is in a format that can be parsed to a Date object
+
+            if (mostRecentEntry === null || entryTime > mostRecentTime) {
+                mostRecentEntry = entry;
+                mostRecentTime = entryTime;
+            }
+        });
+
+        mostRecentEntries[stormId] = mostRecentEntry;
+    });
+
+    return mostRecentEntries;
+  }
+  function findHighestWindSpeedEntry(groupedData) {
+    const mostRecentEntries = findMostRecentEntries(groupedData);
+    let highestWindSpeedEntry = null;
+    let highestWindSpeed = -1;
+
+    Object.values(mostRecentEntries).forEach(entry => {
+        if (entry.wind_speed > highestWindSpeed) {
+            highestWindSpeed = entry.wind_speed;
+            highestWindSpeedEntry = entry;
+        }
+    });
+
+    return highestWindSpeedEntry;
+  }
+  function centerCameraOnLocation(viewer, latitude, longitude, zoomLevel = 10000000) {
+    // Check if viewer, latitude, and longitude are provided
+    if (!viewer || latitude === undefined || longitude === undefined) {
+        console.error("Invalid arguments. Viewer, latitude and longitude are required.");
+        return;
+    }
+
+    // Convert latitude and longitude to Cartesian3 coordinates
+    const destination = Cesium.Cartesian3.fromDegrees(longitude, latitude, zoomLevel);
+
+    // Set the camera to look at the specified location
+    viewer.camera.flyTo({
+        destination: destination,
+        orientation: {
+            heading: Cesium.Math.toRadians(0), // East, default orientation
+            pitch: Cesium.Math.toRadians(-90), // Look directly at the target
+            roll: 0.0
+        },
+        duration: 2 // Duration in seconds for the camera flight
+    });
   }
   if (typeof Cesium !== 'undefined') {
       window.startupCalled = true;
