@@ -6,3 +6,5 @@
 
 # Other
 *.pyc
+
+django/map/templates/static

@@ -1,33 +1,316 @@
-$(document).ready(function () {
+window.startup = async function (Cesium) {
+    'use strict';
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      homeButton: false,
+      navigationHelpButton: false,
+      sceneModePicker: false,
+      timeline: false,
+      baseLayerPicker: false,
+    });
+    const scene = viewer.scene;
+    const globe = scene.globe;
+    const skyAtmosphere = scene.skyAtmosphere;
 
-    $('#sidebarCollapse').on('click', function () {
-        $('#sidebar').toggleClass('active');
-    });
-    addMarkersAndLines(groupData(live_storms));
-    resizeMap();
-    fetchForecasts().then(data => {
-	  if (data) {
-	    console.log('Forecasts data:', data);
-	    createForecastMarkers(data);
-	  } else {
-	    console.log('Failed to fetch forecasts data.');
-	  }
-    });
-});
-function groupData(data) {
-  const result = {};
-  data.forEach(item => {
-    const id = item.id;
-    const time = new Date(item.time);
-    const timestamp = time.getTime();
-    if (result[id]) {
-      result[id].push({ ...item, time: timestamp });
+    scene.highDynamicRange = true;
+    globe.enableLighting = true;
+    globe.atmosphereLightIntensity = 20.0;
+
+    const defaultGroundAtmosphereLightIntensity =
+      globe.atmosphereLightIntensity;
+    const defaultGroundAtmosphereRayleighCoefficient =
+      globe.atmosphereRayleighCoefficient;
+    const defaultGroundAtmosphereMieCoefficient =
+      globe.atmosphereMieCoefficient;
+    const defaultGroundAtmosphereMieAnisotropy =
+      globe.atmosphereMieAnisotropy;
+    const defaultGroundAtmosphereRayleighScaleHeight =
+      globe.atmosphereRayleighScaleHeight;
+    const defaultGroundAtmosphereMieScaleHeight =
+      globe.atmosphereMieScaleHeight;
+    const defaultGroundAtmosphereHueShift = globe.atmosphereHueShift;
+    const defaultGroundAtmosphereSaturationShift =
+      globe.atmosphereSaturationShift;
+    const defaultGroundAtmosphereBrightnessShift =
+      globe.atmosphereBrightnessShift;
+    const defaultLightFadeOut = globe.lightingFadeOutDistance;
+    const defaultLightFadeIn = globe.lightingFadeInDistance;
+    const defaultNightFadeOut = globe.nightFadeOutDistance;
+    const defaultNightFadeIn = globe.nightFadeInDistance;
+
+    const defaultSkyAtmosphereLightIntensity =
+      skyAtmosphere.atmosphereLightIntensity;
+    const defaultSkyAtmosphereRayleighCoefficient =
+      skyAtmosphere.atmosphereRayleighCoefficient;
+    const defaultSkyAtmosphereMieCoefficient =
+      skyAtmosphere.atmosphereMieCoefficient;
+    const defaultSkyAtmosphereMieAnisotropy =
+      skyAtmosphere.atmosphereMieAnisotropy;
+    const defaultSkyAtmosphereRayleighScaleHeight =
+      skyAtmosphere.atmosphereRayleighScaleHeight;
+    const defaultSkyAtmosphereMieScaleHeight =
+      skyAtmosphere.atmosphereMieScaleHeight;
+    const defaultSkyAtmosphereHueShift = skyAtmosphere.hueShift;
+    const defaultSkyAtmosphereSaturationShift =
+      skyAtmosphere.saturationShift;
+    const defaultSkyAtmosphereBrightnessShift =
+      skyAtmosphere.brightnessShift;
+
+    const viewModel = {
+      // Globe settings
+
+      enableTerrain: false,
+      enableLighting: true,
+      groundTranslucency: false,
+
+      // Ground atmosphere settings
+
+      showGroundAtmosphere: true,
+      groundAtmosphereLightIntensity: defaultGroundAtmosphereLightIntensity,
+      groundAtmosphereRayleighCoefficientR:
+        defaultGroundAtmosphereRayleighCoefficient.x / 1e-6,
+      groundAtmosphereRayleighCoefficientG:
+        defaultGroundAtmosphereRayleighCoefficient.y / 1e-6,
+      groundAtmosphereRayleighCoefficientB:
+        defaultGroundAtmosphereRayleighCoefficient.z / 1e-6,
+      groundAtmosphereMieCoefficient:
+        defaultGroundAtmosphereMieCoefficient.x / 1e-6,
+      groundAtmosphereRayleighScaleHeight: defaultGroundAtmosphereRayleighScaleHeight,
+      groundAtmosphereMieScaleHeight: defaultGroundAtmosphereMieScaleHeight,
+      groundAtmosphereMieAnisotropy: defaultGroundAtmosphereMieAnisotropy,
+      groundHueShift: defaultGroundAtmosphereHueShift,
+      groundSaturationShift: defaultGroundAtmosphereSaturationShift,
+      groundBrightnessShift: defaultGroundAtmosphereBrightnessShift,
+      lightingFadeOutDistance: defaultLightFadeOut,
+      lightingFadeInDistance: defaultLightFadeIn,
+      nightFadeOutDistance: defaultNightFadeOut,
+      nightFadeInDistance: defaultNightFadeIn,
+
+      // Sky atmosphere settings
+
+      showSkyAtmosphere: true,
+      skyAtmosphereLightIntensity: defaultSkyAtmosphereLightIntensity,
+      skyAtmosphereRayleighCoefficientR:
+        defaultSkyAtmosphereRayleighCoefficient.x / 1e-6,
+      skyAtmosphereRayleighCoefficientG:
+        defaultSkyAtmosphereRayleighCoefficient.y / 1e-6,
+      skyAtmosphereRayleighCoefficientB:
+        defaultSkyAtmosphereRayleighCoefficient.z / 1e-6,
+      skyAtmosphereMieCoefficient:
+        defaultSkyAtmosphereMieCoefficient.x / 1e-6,
+      skyAtmosphereRayleighScaleHeight: defaultSkyAtmosphereRayleighScaleHeight,
+      skyAtmosphereMieScaleHeight: defaultSkyAtmosphereMieScaleHeight,
+      skyAtmosphereMieAnisotropy: defaultSkyAtmosphereMieAnisotropy,
+      skyHueShift: defaultSkyAtmosphereHueShift,
+      skySaturationShift: defaultSkyAtmosphereSaturationShift,
+      skyBrightnessShift: defaultSkyAtmosphereBrightnessShift,
+      perFragmentAtmosphere: false,
+      dynamicLighting: true,
+      dynamicLightingFromSun: false,
+
+      // Fog settings
+
+      showFog: true,
+      density: 1.0,
+      minimumBrightness: 0.03,
+
+      // Scene settings
+
+      hdr: true,
+  };
+  fetchLiveStorms().then(data => {
+    if (data) {
+      console.log('Forecasts data:', data);
+      const groupedStorms = groupData(data);
+      plotStorms(groupedStorms, viewer);
+      const strongestStorm = findHighestWindSpeedEntry(groupedStorms);
+      centerCameraOnLocation(viewer, strongestStorm.lat, strongestStorm.lon);
+      createForecastMarkers(viewer);
     } else {
-      result[id] = [{ ...item, time: timestamp }];
+      console.log('Failed to fetch forecasts data.');
     }
-    result[id].sort((a, b) => b.time - a.time); // sort the storm data by timestamp in descending order
   });
-  return result;
+};
+async function fetchLiveStorms() {
+  try {
+      const response = await fetch('http://fluids.ai:1337/live-storms'); // Replace with your API endpoint
+      if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+      }
+      const liveStorms = await response.json();
+      return liveStorms;
+  } catch (error) {
+      console.error('Error fetching live storms:', error);
+      return null;
+  }
+}
+function groupData(data) {
+  const groupedData = {};
+  data.forEach(item => {
+      const id = item.id;
+      if (!groupedData[id]) {
+          groupedData[id] = [];
+      }
+      groupedData[id].push(item);
+  });
+  return groupedData;
+}
+function saffirSimpsonCategory(knots) {
+  // Calculate the category based on knots
+  if(knots < 64) {
+      return 'storm';
+  } else if(knots <= 82) {
+      return 'cat1';
+  } else if(knots <= 95) {
+      return 'cat2';
+  } else if(knots <= 113) {
+      return 'cat3';
+  } else if(knots <= 136) {
+      return 'cat4';
+  } else {
+      return 'cat5';
+  }
+}
+function unixSeconds(timestamp) {
+  return Math.floor(new Date(timestamp).getTime() / 1000);
+}
+function plotStorms(groupedData, viewer) {
+  Object.values(groupedData).forEach(storms => {
+      const positions = [];
+      // determine the most recent time for this group
+      const mostRecentTime = Math.max(...storms.map(storm => unixSeconds(storm.time)));
+      console.log(`${storms[0].id} most recent time unix: ${mostRecentTime}`)
+      storms.forEach((storm, index) => {
+          // calculate the opacity based on the time difference from the most recent time
+          const timeDiff = mostRecentTime - unixSeconds(storm.time);
+          const level = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
+          var opacity = level;
+          if (timeDiff > 0) {
+              opacity = Math.max(0, level - 0.1);
+          }
+          console.log(`${storm.id} at ${storm.time} opacity: ${opacity}`)
+          
+          // Add a marker for each storm point
+          const position = Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 100))
+          positions.push(position);
+          viewer.entities.add({
+              position: position,
+              point: {
+                  pixelSize: 50,
+                  color: Cesium.Color.fromCssColorString(
+                      getColorCode(parseFloat(storm.wind_speed))
+                    ).withAlpha(opacity),
+                  scaleByDistance: new Cesium.NearFarScalar(0, 5, 8000000, 1)  
+              }
+          });
+
+          // Add a billboard as a marker for each storm point
+          let category = saffirSimpsonCategory(parseFloat(storm.wind_speed));
+          if (timeDiff > 0) {
+              opacity = Math.max(0, level - 0.25);
+          }
+          viewer.entities.add({
+              position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 10000)),
+              billboard: {
+                  image: `static/${category}.png`,
+                  color: new Cesium.Color(1.0, 1.0, 1.0, opacity),
+                  scaleByDistance: new Cesium.NearFarScalar(0, 0.2, 8000000, 0)
+              },
+              description: `
+                  <h4>Storm History</h4>
+                  <ul>
+                      <li><strong>Storm ID:</strong> ${storm.id}</li>
+                      <li><strong>Time:</strong> ${storm.time}</li>
+                      <li><strong>Latitude:</strong> ${storm.lat}</li>
+                      <li><strong>Longitude:</strong> ${storm.lon}</li>
+                      <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
+                      <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
+                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
+                  </ul>
+              `
+          });
+      });
+      // Add a line to connect the storm points
+      viewer.entities.add({
+          polyline: {
+              positions: positions,
+              width: 2,
+              material: Cesium.Color.RED
+          }
+      });
+  });
+}
+function getColorCode(knots) {
+  if (knots < 34) {
+      return "#008000"; // Tropical Depression - Green
+  } else if (knots >= 34 && knots <= 63) {
+      return "#FFFF00"; // Tropical Storm - Yellow
+  } else if (knots >= 64 && knots <= 82) {
+      return "#ff8000"; // Category 1 - Orange
+  } else if (knots >= 83 && knots <= 95) {
+      return "#FF4040"; // Category 2 -  Light Red
+  } else if (knots >= 96 && knots <= 112) {
+      return "#FF0000"; // Category 3 - Medium Red
+  } else if (knots >= 113 && knots <= 135) {
+      return "#b30000"; // Category 4 - Dark Red
+  } else {
+      return "#b300b3"; // Category 5 - Fuchsia
+  }
+}
+function findMostRecentEntries(groupedData) {
+  const mostRecentEntries = {};
+
+  Object.keys(groupedData).forEach(stormId => {
+      let mostRecentEntry = null;
+      let mostRecentTime = 0;
+
+      groupedData[stormId].forEach(entry => {
+          const entryTime = new Date(entry.time).getTime(); // Assuming 'time' is in a format that can be parsed to a Date object
+
+          if (mostRecentEntry === null || entryTime > mostRecentTime) {
+              mostRecentEntry = entry;
+              mostRecentTime = entryTime;
+          }
+      });
+
+      mostRecentEntries[stormId] = mostRecentEntry;
+  });
+
+  return mostRecentEntries;
+}
+function findHighestWindSpeedEntry(groupedData) {
+  const mostRecentEntries = findMostRecentEntries(groupedData);
+  let highestWindSpeedEntry = null;
+  let highestWindSpeed = -1;
+
+  Object.values(mostRecentEntries).forEach(entry => {
+      if (entry.wind_speed > highestWindSpeed) {
+          highestWindSpeed = entry.wind_speed;
+          highestWindSpeedEntry = entry;
+      }
+  });
+
+  return highestWindSpeedEntry;
+}
+function centerCameraOnLocation(viewer, latitude, longitude, zoomLevel = 10000000) {
+  // Check if viewer, latitude, and longitude are provided
+  if (!viewer || latitude === undefined || longitude === undefined) {
+      console.error("Invalid arguments. Viewer, latitude and longitude are required.");
+      return;
+  }
+
+  // Convert latitude and longitude to Cartesian3 coordinates
+  const destination = Cesium.Cartesian3.fromDegrees(longitude, latitude, zoomLevel);
+
+  // Set the camera to look at the specified location
+  viewer.camera.flyTo({
+      destination: destination,
+      orientation: {
+          heading: Cesium.Math.toRadians(0), // East, default orientation
+          pitch: Cesium.Math.toRadians(-90), // Look directly at the target
+          roll: 0.0
+      },
+      duration: 2 // Duration in seconds for the camera flight
+  });
 }
 async function fetchForecasts() {
   try {
@@ -49,260 +332,88 @@ async function fetchForecasts() {
     return null;
   }
 }
+async function createForecastMarkers(viewer) {
+  const forecasts = await fetchForecasts();
+  if (!forecasts) {
+      console.error('Failed to fetch forecasts');
+      return;
+  }
 
-function getColorCode(knots) {
-    if (knots < 34) {
-        return "#008000"; // Tropical Depression - Green
-    } else if (knots >= 34 && knots <= 63) {
-        return "#FFFF00"; // Tropical Storm - Yellow
-    } else if (knots >= 64 && knots <= 82) {
-        return "#FFC0C0"; // Category 1 - Light Red
-    } else if (knots >= 83 && knots <= 95) {
-        return "#FF8080"; // Category 2 - Medium Light Red
-    } else if (knots >= 96 && knots <= 112) {
-        return "#FF4040"; // Category 3 - Medium Red
-    } else if (knots >= 113 && knots <= 135) {
-        return "#FF0000"; // Category 4 - Dark Red
-    } else {
-        return "#8B0000"; // Category 5 - Very Dark Red
-    }
-}
-function createForecastMarkers(forecasts) {
-  const markers = [];
   const groupedForecasts = {};
-  const forecastLine = { color: 'red', opacity: 0.5 };
 
   // Group forecasts by model and then by storm ID
   forecasts.forEach(forecast => {
-    if (!groupedForecasts[forecast.model]) {
-      groupedForecasts[forecast.model] = {};
-    }
-    if (!groupedForecasts[forecast.model][forecast.id]) {
-      groupedForecasts[forecast.model][forecast.id] = [];
-    }
-    groupedForecasts[forecast.model][forecast.id].push(forecast);
+      if (!groupedForecasts[forecast.model]) {
+          groupedForecasts[forecast.model] = {};
+      }
+      if (!groupedForecasts[forecast.model][forecast.id]) {
+          groupedForecasts[forecast.model][forecast.id] = [];
+      }
+      groupedForecasts[forecast.model][forecast.id].push(forecast);
   });
 
-  // Iterate through each model
   Object.keys(groupedForecasts).forEach(model => {
-    // Iterate through each storm ID within the model
-    Object.keys(groupedForecasts[model]).forEach(stormId => {
-      const latlngs = [];
+      Object.keys(groupedForecasts[model]).forEach(stormId => {
+          let positions = [];
+          let prevForecast = null;
 
-      groupedForecasts[model][stormId].forEach((forecast, index, self) => {
-        let latLng = new L.LatLng(forecast.lat, forecast.lon);
-        let prevForecast = self[index - 1];
-        let marker = L.circleMarker(latLng, {
-          radius: 5,
-          fillColor: "#FFFFFF",
-          color: "#FFFFFF",
-          weight: 1,
-          opacity: 1,
-          fillOpacity: 1.0,
-          zIndexOffset: 1000
-        }).addTo(map);
+          groupedForecasts[model][stormId].forEach(forecast => {
+              const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 100000);
+              // Add a marker for each forecast point
+              viewer.entities.add({
+                  position: position,
+                  point: {
+                      pixelSize: 5,
+                      color: Cesium.Color.WHITE,
+                      outlineColor: Cesium.Color.WHITE,
+                      outlineWidth: 1
+                  },
+                  description: `
+                      <h4>Forecast Details</h4>
+                      <ul>
+                          <li><strong>Model:</strong> ${forecast.model}</li>
+                          <li><strong>ID:</strong> ${forecast.id}</li>
+                          <li><strong>Time:</strong> ${forecast.time}</li>
+                          <li><strong>Latitude:</strong> ${forecast.lat}</li>
+                          <li><strong>Longitude:</strong> ${forecast.lon}</li>
+                          <li><strong>Wind Speed:</strong> ${forecast.wind_speed} knots</li>
+                      </ul>
+                  `
+              });
 
-        if (prevForecast) {
-          if (Math.abs(prevForecast.lon - forecast.lon) > 180) {
-            // This means we crossed the International Date Line
-            // First, complete the existing polyline
-            L.polyline(latlngs, forecastLine).addTo(map);
-            latlngs = [];
+              if (prevForecast && Math.abs(prevForecast.lon - forecast.lon) > 180) {
+                  // Handle crossing the International Date Line
+                  viewer.entities.add({
+                      polyline: {
+                          positions: positions,
+                          width: 2,
+                          material: Cesium.Color.FUCHSIA.withAlpha(0.8)
+                      }
+                  });
+                  positions = [];
+              }
+              prevForecast = forecast;
+              positions.push(position);
+          });
+
+          if (positions.length > 0) {
+              // Create and add the polyline for the current storm ID group
+              viewer.entities.add({
+                  polyline: {
+                      positions: positions,
+                      width: 2,
+                      material: Cesium.Color.FUCHSIA.withAlpha(0.8)
+                  }
+              });
           }
-        }
-
-        // Bind tooltip to the marker
-        marker.bindTooltip(`
-          <strong>Model:</strong>${forecast.model}<br>
-          <strong>ID:</strong> ${forecast.id}<br>
-          <strong>Time:</strong> ${forecast.time}<br>
-          <strong>Latitude:</strong> ${forecast.lat}<br>
-          <strong>Longitude:</strong> ${forecast.lon}<br>
-          <strong>Wind Speed:</strong> ${forecast.wind_speed} knots
-        `);
-
-        markers.push(marker);
-        latlngs.push(latLng);
       });
-
-      // Create and add the polyline to the map for the current storm ID group
-      const polyline = L.polyline(latlngs, forecastLine).addTo(map);
-    });
   });
 }
 
-function hurricaneCategory(knots) {
-    // Calculate the category based on knots
-    if(knots < 64) {
-        return 'storm';
-    } else if(knots <= 82) {
-        return 'cat1';
-    } else if(knots <= 95) {
-        return 'cat2';
-    } else if(knots <= 113) {
-        return 'cat3';
-    } else if(knots <= 136) {
-        return 'cat4';
-    } else {
-        return 'cat5';
-    }
-}
-
-function addMarkersAndLines(groupedData) {
-    // create an empty array to hold the polyline latlngs
-    const polylineLatLngs = [];
-    // loop through each storm id in the grouped data
-    for (const id in groupedData) {
-        // get the array of storm objects for this id
-        const storms = groupedData[id];
-
-        // determine the most recent time for this group
-        const mostRecentTime = Math.max(...storms.map(storm => storm.time));
-
-        // Initialize lastLongitude with the first storm's longitude for checking International Date Line crossings
-        let lastLongitude = storms[0].lon;
-
-        // loop through each storm object in the array
-        storms.forEach((storm, index) => {
-            // calculate the opacity based on the time difference from the most recent time
-            const timeDiff = mostRecentTime - storm.time;
-            var opacity = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60 * 1000))); // 6 days
-            if (index > 0) {
-                opacity = Math.max(0, opacity - 0.25);
-            }
-
-            // Check if we have crossed the International Date Line
-            if (Math.abs(storm.lon - lastLongitude) > 180) {
-                // If a crossing is detected, draw the accumulated polylineLatLngs up to that point
-                L.polyline(polylineLatLngs, { color: 'red' }).addTo(map);
-
-                // Clear the accumulated points to start a new segment of the storm's path
-                polylineLatLngs.length = 0;
-            }
-
-            // Update the lastLongitude for the next iteration
-            lastLongitude = storm.lon;
-
-            if (timeDiff <= 5 * 24 * 60 * 60 * 1000) {
-                let category = hurricaneCategory(parseFloat(storm.int));
-
-                const marker = L.marker([storm.lat, storm.lon], {
-                    'zIndexOffset': opacity * 1000,
-                    'icon': L.icon({
-                        'iconUrl': `static/${category}.png`,
-                        'iconSize': [33, 33],
-                        'iconAnchor': [22, 33],
-                        'popupAnchor': [-3, -76]
-                    })
-                }).addTo(map);
-		// Convert wind speed from knots to mph and kmh
-		const windSpeedMph = (storm.int * 1.15078).toFixed(2); // rounded to 2 decimal places for clarity
-		const windSpeedKmh = (storm.int * 1.852).toFixed(2); 
-		
-		// Derive the storm category based on the Saffir-Simpson scale
-		let stormCategory;
-		if (storm.int < 34) {
-		    stormCategory = "Tropical Depression";
-		} else if (storm.int < 64) {
-		    stormCategory = "Tropical Storm";
-		} else if (storm.int < 83) {
-		    stormCategory = "Category 1";
-		} else if (storm.int < 96) {
-		    stormCategory = "Category 2";
-		} else if (storm.int < 113) {
-		    stormCategory = "Category 3";
-		} else if (storm.int < 137) {
-		    stormCategory = "Category 4";
-		} else {
-		    stormCategory = "Category 5";
-		}
-		
-		// Update the marker tooltip
-		marker.bindTooltip(`
-		    ID: ${storm.id}<br>
-		    Time: ${new Date(storm.time).toLocaleString()}<br>
-		    Latitude: ${storm.lat}<br>
-		    Longitude: ${storm.lon}<br>
-		    Wind Speed: ${storm.int} knots (${windSpeedMph} mph / ${windSpeedKmh} kmh)<br>
-		    Category: ${stormCategory}
-		`);
-                marker.setOpacity(opacity);
-            }
-
-            // add the marker latlng to the polyline latlngs array
-            polylineLatLngs.push([storm.lat, storm.lon]);
-
-            let circleColor = getColorCode(parseFloat(storm.int));
-            const circle = L.circle([storm.lat, storm.lon], {
-                'opacity': opacity,
-                'zIndexOffset': opacity * 100,
-                'color': circleColor,
-                'radius': 100000 * 2 // twice the avg radius 
-            }).addTo(map);
-        });
-
-        // After iterating through all storms for a given id, add a polyline for any remaining points
-        if (polylineLatLngs.length > 0) {
-            L.polyline(polylineLatLngs, { color: 'red' }).addTo(map);
-        }
-
-        // reset the polyline latlngs array for the next storm id
-        polylineLatLngs.length = 0;
-    }
-}
-
-var map = L.map('map').setView([0, 0], 2);
-
-var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    opacity: 0.7,  // Set OSM layer opacity to 0.7
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-OpenStreetMap_Mapnik.bringToFront();  // Ensure the OSM layer is always on top
-
-function onMapClick(e) {
-    popup
-        .setLatLng(e.latlng)
-        .setContent('You clicked the map at ' + e.latlng.toString())
-        .openOn(map);
-}
-function getVisibleMarkers() {
-    const bounds = new L.LatLngBounds();
-    map.eachLayer(function(layer) {
-        if ((layer instanceof L.Marker) && (map.getBounds().contains(layer.getLatLng()))){
-            bounds.extend(layer.getLatLng());
-        }
+if (typeof Cesium !== 'undefined') {
+    window.startupCalled = true;
+    window.startup(Cesium).catch((error) => {
+      "use strict";
+      console.error(error);
     });
-    return bounds;
-}
-function resizeMap() {
-    document.getElementById('map').style.width = window.screen.width.toString() + "px";
-    document.getElementById('map').style.height = window.screen.height.toString() + "px";
-    map.invalidateSize();
-    map.fitBounds(getVisibleMarkers().pad(0.5));
-}
-map.on('click', onMapClick);
-
-
-var plot;
-document.getElementById('plot_button').onclick = function() {
-    var sid = document.getElementById("inputGroupSelect04").value;
-    plot = $.get('/?type=plot&SID=' + sid, (data, status) => {
-        console.log('test ' + sid + data);
-        return data;
-    });
-    plot.then(function(e){
-        plot.data = JSON.parse(plot.responseText);
-        console.log(plot.data);
-        var i;
-        var path = []
-        for (i = 0; i < plot.data["lat"].length; i++) {
-            path.push(new google.maps.LatLng(plot.data["lat"][i], plot.data["lon"][i]))
-        }
-        var polyline = new google.maps.Polyline({path:path, strokeColor: "#FF0000", strokeOpacity: 1.0, strokeWeight: 2});
-        polyline.setMap(map);
-        map.setCenter(new google.maps.LatLng(plot.data["lat"][0], plot.data["lon"][0]), 6);
-    });
-
 }
