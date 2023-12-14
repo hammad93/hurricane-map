@@ -1,122 +1,48 @@
+/*
+               ,,ggddY"""Ybbgg,,
+          ,agd888b,_ "Y8, ___`""Ybga,
+       ,gdP""88888888baa,.""8b    "888g,
+     ,dP"     ]888888888P'  "Y     `888Yb,
+   ,dP"      ,88888888P"  db,       "8P""Yb,
+  ,8"       ,888888888b, d8888a           "8,
+ ,8'        d88888888888,88P"' a,          `8,
+,8'         88888888888888PP"  ""           `8,
+d'          I88888888888P"                   `b
+8           `8"88P""Y8P'                      8
+8            Y 8[  _ "                        8
+8              "Y8d8b  "Y a                   8
+8                 `""8d,   __                 8
+Y,                    `"8bd888b,             ,P
+`8,                     ,d8888888baaa       ,8'
+ `8,                    888888888888'      ,8'
+  `8a                   "8888888888I      a8'
+   `Yba                  `Y8888888P'    adP'
+     "Yba                 `888888P'   adY"
+       `"Yba,             d8888P" ,adP"'     https://ascii.co.uk
+          `"Y8baa,      ,d888P,ad8P"'
+               ``""YYba8888P""''
+
+      ┬ ┬┬ ┬┬─┐┬─┐┬┌─┐┌─┐┌┐┌┌─┐  ┌┬┐┌─┐┌─┐
+      ├─┤│ │├┬┘├┬┘││  ├─┤│││├┤───│││├─┤├─┘
+      ┴ ┴└─┘┴└─┴└─┴└─┘┴ ┴┘└┘└─┘  ┴ ┴┴ ┴┴  
+*/
+
 window.startup = async function (Cesium) {
-    'use strict';
-    const viewer = new Cesium.Viewer("cesiumContainer", {
-      homeButton: false,
-      navigationHelpButton: false,
-      sceneModePicker: false,
-      timeline: false,
-      baseLayerPicker: false,
-    });
-    const scene = viewer.scene;
-    const globe = scene.globe;
-    const skyAtmosphere = scene.skyAtmosphere;
+  'use strict';
+  const viewer = new Cesium.Viewer("cesiumContainer", {
+    homeButton: false,
+    navigationHelpButton: false,
+    sceneModePicker: false,
+    timeline: false,
+    baseLayerPicker: false,
+  });
+  const scene = viewer.scene;
+  const globe = scene.globe;
 
-    scene.highDynamicRange = true;
-    globe.enableLighting = true;
-    globe.atmosphereLightIntensity = 20.0;
-
-    const defaultGroundAtmosphereLightIntensity =
-      globe.atmosphereLightIntensity;
-    const defaultGroundAtmosphereRayleighCoefficient =
-      globe.atmosphereRayleighCoefficient;
-    const defaultGroundAtmosphereMieCoefficient =
-      globe.atmosphereMieCoefficient;
-    const defaultGroundAtmosphereMieAnisotropy =
-      globe.atmosphereMieAnisotropy;
-    const defaultGroundAtmosphereRayleighScaleHeight =
-      globe.atmosphereRayleighScaleHeight;
-    const defaultGroundAtmosphereMieScaleHeight =
-      globe.atmosphereMieScaleHeight;
-    const defaultGroundAtmosphereHueShift = globe.atmosphereHueShift;
-    const defaultGroundAtmosphereSaturationShift =
-      globe.atmosphereSaturationShift;
-    const defaultGroundAtmosphereBrightnessShift =
-      globe.atmosphereBrightnessShift;
-    const defaultLightFadeOut = globe.lightingFadeOutDistance;
-    const defaultLightFadeIn = globe.lightingFadeInDistance;
-    const defaultNightFadeOut = globe.nightFadeOutDistance;
-    const defaultNightFadeIn = globe.nightFadeInDistance;
-
-    const defaultSkyAtmosphereLightIntensity =
-      skyAtmosphere.atmosphereLightIntensity;
-    const defaultSkyAtmosphereRayleighCoefficient =
-      skyAtmosphere.atmosphereRayleighCoefficient;
-    const defaultSkyAtmosphereMieCoefficient =
-      skyAtmosphere.atmosphereMieCoefficient;
-    const defaultSkyAtmosphereMieAnisotropy =
-      skyAtmosphere.atmosphereMieAnisotropy;
-    const defaultSkyAtmosphereRayleighScaleHeight =
-      skyAtmosphere.atmosphereRayleighScaleHeight;
-    const defaultSkyAtmosphereMieScaleHeight =
-      skyAtmosphere.atmosphereMieScaleHeight;
-    const defaultSkyAtmosphereHueShift = skyAtmosphere.hueShift;
-    const defaultSkyAtmosphereSaturationShift =
-      skyAtmosphere.saturationShift;
-    const defaultSkyAtmosphereBrightnessShift =
-      skyAtmosphere.brightnessShift;
-
-    const viewModel = {
-      // Globe settings
-
-      enableTerrain: false,
-      enableLighting: true,
-      groundTranslucency: false,
-
-      // Ground atmosphere settings
-
-      showGroundAtmosphere: true,
-      groundAtmosphereLightIntensity: defaultGroundAtmosphereLightIntensity,
-      groundAtmosphereRayleighCoefficientR:
-        defaultGroundAtmosphereRayleighCoefficient.x / 1e-6,
-      groundAtmosphereRayleighCoefficientG:
-        defaultGroundAtmosphereRayleighCoefficient.y / 1e-6,
-      groundAtmosphereRayleighCoefficientB:
-        defaultGroundAtmosphereRayleighCoefficient.z / 1e-6,
-      groundAtmosphereMieCoefficient:
-        defaultGroundAtmosphereMieCoefficient.x / 1e-6,
-      groundAtmosphereRayleighScaleHeight: defaultGroundAtmosphereRayleighScaleHeight,
-      groundAtmosphereMieScaleHeight: defaultGroundAtmosphereMieScaleHeight,
-      groundAtmosphereMieAnisotropy: defaultGroundAtmosphereMieAnisotropy,
-      groundHueShift: defaultGroundAtmosphereHueShift,
-      groundSaturationShift: defaultGroundAtmosphereSaturationShift,
-      groundBrightnessShift: defaultGroundAtmosphereBrightnessShift,
-      lightingFadeOutDistance: defaultLightFadeOut,
-      lightingFadeInDistance: defaultLightFadeIn,
-      nightFadeOutDistance: defaultNightFadeOut,
-      nightFadeInDistance: defaultNightFadeIn,
-
-      // Sky atmosphere settings
-
-      showSkyAtmosphere: true,
-      skyAtmosphereLightIntensity: defaultSkyAtmosphereLightIntensity,
-      skyAtmosphereRayleighCoefficientR:
-        defaultSkyAtmosphereRayleighCoefficient.x / 1e-6,
-      skyAtmosphereRayleighCoefficientG:
-        defaultSkyAtmosphereRayleighCoefficient.y / 1e-6,
-      skyAtmosphereRayleighCoefficientB:
-        defaultSkyAtmosphereRayleighCoefficient.z / 1e-6,
-      skyAtmosphereMieCoefficient:
-        defaultSkyAtmosphereMieCoefficient.x / 1e-6,
-      skyAtmosphereRayleighScaleHeight: defaultSkyAtmosphereRayleighScaleHeight,
-      skyAtmosphereMieScaleHeight: defaultSkyAtmosphereMieScaleHeight,
-      skyAtmosphereMieAnisotropy: defaultSkyAtmosphereMieAnisotropy,
-      skyHueShift: defaultSkyAtmosphereHueShift,
-      skySaturationShift: defaultSkyAtmosphereSaturationShift,
-      skyBrightnessShift: defaultSkyAtmosphereBrightnessShift,
-      perFragmentAtmosphere: false,
-      dynamicLighting: true,
-      dynamicLightingFromSun: false,
-
-      // Fog settings
-
-      showFog: true,
-      density: 1.0,
-      minimumBrightness: 0.03,
-
-      // Scene settings
-
-      hdr: true,
-  };
+  scene.highDynamicRange = true;
+  globe.enableLighting = true;
+  globe.atmosphereLightIntensity = 20.0;
+  
   fetchLiveStorms().then(data => {
     if (data) {
       console.log('Forecasts data:', data);
@@ -185,10 +111,23 @@ function plotStorms(groupedData, viewer) {
           const level = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
           var opacity = level;
           if (timeDiff > 0) {
-              opacity = Math.max(0, level - 0.1);
+              opacity = Math.max(0.05, level - 0.1);
           }
           console.log(`${storm.id} at ${storm.time} opacity: ${opacity}`)
-          
+
+          // create description for each storm track record
+          const description_html = `
+                  <h4>Storm History</h4>
+                  <ul>
+                      <li><strong>Storm ID:</strong> ${storm.id}</li>
+                      <li><strong>Time:</strong> ${storm.time}</li>
+                      <li><strong>Latitude:</strong> ${storm.lat}</li>
+                      <li><strong>Longitude:</strong> ${storm.lon}</li>
+                      <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
+                      <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
+                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
+                  </ul>
+          `
           // Add a marker for each storm point
           const position = Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 100))
           positions.push(position);
@@ -200,33 +139,23 @@ function plotStorms(groupedData, viewer) {
                       getColorCode(parseFloat(storm.wind_speed))
                     ).withAlpha(opacity),
                   scaleByDistance: new Cesium.NearFarScalar(0, 5, 8000000, 1)  
-              }
+              },
+              description: description_html
           });
 
           // Add a billboard as a marker for each storm point
           let category = saffirSimpsonCategory(parseFloat(storm.wind_speed));
           if (timeDiff > 0) {
-              opacity = Math.max(0, level - 0.25);
+              opacity = Math.max(0.2, level - 0.25);
           }
           viewer.entities.add({
               position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 10000)),
               billboard: {
                   image: `static/${category}.png`,
                   color: new Cesium.Color(1.0, 1.0, 1.0, opacity),
-                  scaleByDistance: new Cesium.NearFarScalar(0, 0.2, 8000000, 0)
+                  scaleByDistance: new Cesium.NearFarScalar(0, 0.2, 10000000, 0.05)
               },
-              description: `
-                  <h4>Storm History</h4>
-                  <ul>
-                      <li><strong>Storm ID:</strong> ${storm.id}</li>
-                      <li><strong>Time:</strong> ${storm.time}</li>
-                      <li><strong>Latitude:</strong> ${storm.lat}</li>
-                      <li><strong>Longitude:</strong> ${storm.lon}</li>
-                      <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
-                      <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
-                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
-                  </ul>
-              `
+              description: description_html
           });
       });
       // Add a line to connect the storm points
