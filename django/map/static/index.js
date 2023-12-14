@@ -28,124 +28,21 @@ Y,                    `"8bd888b,             ,P
 */
 
 window.startup = async function (Cesium) {
-    'use strict';
-    const viewer = new Cesium.Viewer("cesiumContainer", {
-      homeButton: false,
-      navigationHelpButton: false,
-      sceneModePicker: false,
-      timeline: false,
-      baseLayerPicker: false,
-    });
-    const scene = viewer.scene;
-    const globe = scene.globe;
-    const skyAtmosphere = scene.skyAtmosphere;
+  'use strict';
+  const viewer = new Cesium.Viewer("cesiumContainer", {
+    homeButton: false,
+    navigationHelpButton: false,
+    sceneModePicker: false,
+    timeline: false,
+    baseLayerPicker: false,
+  });
+  const scene = viewer.scene;
+  const globe = scene.globe;
 
-    scene.highDynamicRange = true;
-    globe.enableLighting = true;
-    globe.atmosphereLightIntensity = 20.0;
-
-    const defaultGroundAtmosphereLightIntensity =
-      globe.atmosphereLightIntensity;
-    const defaultGroundAtmosphereRayleighCoefficient =
-      globe.atmosphereRayleighCoefficient;
-    const defaultGroundAtmosphereMieCoefficient =
-      globe.atmosphereMieCoefficient;
-    const defaultGroundAtmosphereMieAnisotropy =
-      globe.atmosphereMieAnisotropy;
-    const defaultGroundAtmosphereRayleighScaleHeight =
-      globe.atmosphereRayleighScaleHeight;
-    const defaultGroundAtmosphereMieScaleHeight =
-      globe.atmosphereMieScaleHeight;
-    const defaultGroundAtmosphereHueShift = globe.atmosphereHueShift;
-    const defaultGroundAtmosphereSaturationShift =
-      globe.atmosphereSaturationShift;
-    const defaultGroundAtmosphereBrightnessShift =
-      globe.atmosphereBrightnessShift;
-    const defaultLightFadeOut = globe.lightingFadeOutDistance;
-    const defaultLightFadeIn = globe.lightingFadeInDistance;
-    const defaultNightFadeOut = globe.nightFadeOutDistance;
-    const defaultNightFadeIn = globe.nightFadeInDistance;
-
-    const defaultSkyAtmosphereLightIntensity =
-      skyAtmosphere.atmosphereLightIntensity;
-    const defaultSkyAtmosphereRayleighCoefficient =
-      skyAtmosphere.atmosphereRayleighCoefficient;
-    const defaultSkyAtmosphereMieCoefficient =
-      skyAtmosphere.atmosphereMieCoefficient;
-    const defaultSkyAtmosphereMieAnisotropy =
-      skyAtmosphere.atmosphereMieAnisotropy;
-    const defaultSkyAtmosphereRayleighScaleHeight =
-      skyAtmosphere.atmosphereRayleighScaleHeight;
-    const defaultSkyAtmosphereMieScaleHeight =
-      skyAtmosphere.atmosphereMieScaleHeight;
-    const defaultSkyAtmosphereHueShift = skyAtmosphere.hueShift;
-    const defaultSkyAtmosphereSaturationShift =
-      skyAtmosphere.saturationShift;
-    const defaultSkyAtmosphereBrightnessShift =
-      skyAtmosphere.brightnessShift;
-
-    const viewModel = {
-      // Globe settings
-
-      enableTerrain: false,
-      enableLighting: true,
-      groundTranslucency: false,
-
-      // Ground atmosphere settings
-
-      showGroundAtmosphere: true,
-      groundAtmosphereLightIntensity: defaultGroundAtmosphereLightIntensity,
-      groundAtmosphereRayleighCoefficientR:
-        defaultGroundAtmosphereRayleighCoefficient.x / 1e-6,
-      groundAtmosphereRayleighCoefficientG:
-        defaultGroundAtmosphereRayleighCoefficient.y / 1e-6,
-      groundAtmosphereRayleighCoefficientB:
-        defaultGroundAtmosphereRayleighCoefficient.z / 1e-6,
-      groundAtmosphereMieCoefficient:
-        defaultGroundAtmosphereMieCoefficient.x / 1e-6,
-      groundAtmosphereRayleighScaleHeight: defaultGroundAtmosphereRayleighScaleHeight,
-      groundAtmosphereMieScaleHeight: defaultGroundAtmosphereMieScaleHeight,
-      groundAtmosphereMieAnisotropy: defaultGroundAtmosphereMieAnisotropy,
-      groundHueShift: defaultGroundAtmosphereHueShift,
-      groundSaturationShift: defaultGroundAtmosphereSaturationShift,
-      groundBrightnessShift: defaultGroundAtmosphereBrightnessShift,
-      lightingFadeOutDistance: defaultLightFadeOut,
-      lightingFadeInDistance: defaultLightFadeIn,
-      nightFadeOutDistance: defaultNightFadeOut,
-      nightFadeInDistance: defaultNightFadeIn,
-
-      // Sky atmosphere settings
-
-      showSkyAtmosphere: true,
-      skyAtmosphereLightIntensity: defaultSkyAtmosphereLightIntensity,
-      skyAtmosphereRayleighCoefficientR:
-        defaultSkyAtmosphereRayleighCoefficient.x / 1e-6,
-      skyAtmosphereRayleighCoefficientG:
-        defaultSkyAtmosphereRayleighCoefficient.y / 1e-6,
-      skyAtmosphereRayleighCoefficientB:
-        defaultSkyAtmosphereRayleighCoefficient.z / 1e-6,
-      skyAtmosphereMieCoefficient:
-        defaultSkyAtmosphereMieCoefficient.x / 1e-6,
-      skyAtmosphereRayleighScaleHeight: defaultSkyAtmosphereRayleighScaleHeight,
-      skyAtmosphereMieScaleHeight: defaultSkyAtmosphereMieScaleHeight,
-      skyAtmosphereMieAnisotropy: defaultSkyAtmosphereMieAnisotropy,
-      skyHueShift: defaultSkyAtmosphereHueShift,
-      skySaturationShift: defaultSkyAtmosphereSaturationShift,
-      skyBrightnessShift: defaultSkyAtmosphereBrightnessShift,
-      perFragmentAtmosphere: false,
-      dynamicLighting: true,
-      dynamicLightingFromSun: false,
-
-      // Fog settings
-
-      showFog: true,
-      density: 1.0,
-      minimumBrightness: 0.03,
-
-      // Scene settings
-
-      hdr: true,
-  };
+  scene.highDynamicRange = true;
+  globe.enableLighting = true;
+  globe.atmosphereLightIntensity = 20.0;
+  
   fetchLiveStorms().then(data => {
     if (data) {
       console.log('Forecasts data:', data);
