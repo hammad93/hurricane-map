@@ -1,3 +1,32 @@
+/*
+               ,,ggddY"""Ybbgg,,
+          ,agd888b,_ "Y8, ___`""Ybga,
+       ,gdP""88888888baa,.""8b    "888g,
+     ,dP"     ]888888888P'  "Y     `888Yb,
+   ,dP"      ,88888888P"  db,       "8P""Yb,
+  ,8"       ,888888888b, d8888a           "8,
+ ,8'        d88888888888,88P"' a,          `8,
+,8'         88888888888888PP"  ""           `8,
+d'          I88888888888P"                   `b
+8           `8"88P""Y8P'                      8
+8            Y 8[  _ "                        8
+8              "Y8d8b  "Y a                   8
+8                 `""8d,   __                 8
+Y,                    `"8bd888b,             ,P
+`8,                     ,d8888888baaa       ,8'
+ `8,                    888888888888'      ,8'
+  `8a                   "8888888888I      a8'
+   `Yba                  `Y8888888P'    adP'
+     "Yba                 `888888P'   adY"
+       `"Yba,             d8888P" ,adP"'     https://ascii.co.uk
+          `"Y8baa,      ,d888P,ad8P"'
+               ``""YYba8888P""''
+
+      ┬ ┬┬ ┬┬─┐┬─┐┬┌─┐┌─┐┌┐┌┌─┐  ┌┬┐┌─┐┌─┐
+      ├─┤│ │├┬┘├┬┘││  ├─┤│││├┤───│││├─┤├─┘
+      ┴ ┴└─┘┴└─┴└─┴└─┘┴ ┴┘└┘└─┘  ┴ ┴┴ ┴┴  
+*/
+
 window.startup = async function (Cesium) {
     'use strict';
     const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -185,10 +214,23 @@ function plotStorms(groupedData, viewer) {
           const level = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
           var opacity = level;
           if (timeDiff > 0) {
-              opacity = Math.max(0, level - 0.1);
+              opacity = Math.max(0.05, level - 0.1);
           }
           console.log(`${storm.id} at ${storm.time} opacity: ${opacity}`)
-          
+
+          // create description for each storm track record
+          const description_html = `
+                  <h4>Storm History</h4>
+                  <ul>
+                      <li><strong>Storm ID:</strong> ${storm.id}</li>
+                      <li><strong>Time:</strong> ${storm.time}</li>
+                      <li><strong>Latitude:</strong> ${storm.lat}</li>
+                      <li><strong>Longitude:</strong> ${storm.lon}</li>
+                      <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
+                      <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
+                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
+                  </ul>
+          `
           // Add a marker for each storm point
           const position = Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 100))
           positions.push(position);
@@ -200,33 +242,23 @@ function plotStorms(groupedData, viewer) {
                       getColorCode(parseFloat(storm.wind_speed))
                     ).withAlpha(opacity),
                   scaleByDistance: new Cesium.NearFarScalar(0, 5, 8000000, 1)  
-              }
+              },
+              description: description_html
           });
 
           // Add a billboard as a marker for each storm point
           let category = saffirSimpsonCategory(parseFloat(storm.wind_speed));
           if (timeDiff > 0) {
-              opacity = Math.max(0, level - 0.25);
+              opacity = Math.max(0.2, level - 0.25);
           }
           viewer.entities.add({
               position: Cesium.Cartesian3.fromDegrees(storm.lon, storm.lat, (level * 10000)),
               billboard: {
                   image: `static/${category}.png`,
                   color: new Cesium.Color(1.0, 1.0, 1.0, opacity),
-                  scaleByDistance: new Cesium.NearFarScalar(0, 0.2, 8000000, 0)
+                  scaleByDistance: new Cesium.NearFarScalar(0, 0.2, 10000000, 0.05)
               },
-              description: `
-                  <h4>Storm History</h4>
-                  <ul>
-                      <li><strong>Storm ID:</strong> ${storm.id}</li>
-                      <li><strong>Time:</strong> ${storm.time}</li>
-                      <li><strong>Latitude:</strong> ${storm.lat}</li>
-                      <li><strong>Longitude:</strong> ${storm.lon}</li>
-                      <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
-                      <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
-                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
-                  </ul>
-              `
+              description: description_html
           });
       });
       // Add a line to connect the storm points
