@@ -34,10 +34,27 @@ window.startup = async function (Cesium) {
     navigationHelpButton: false,
     sceneModePicker: false,
     timeline: false,
+    imageryProvider: false,
     baseLayerPicker: false,
   });
   const scene = viewer.scene;
   const globe = scene.globe;
+  
+  // https://nasa-gibs.github.io/gibs-api-docs/access-advanced-topics/
+  // https://nasa-gibs.github.io/gibs-api-docs/available-visualizations/
+  var base = new Cesium.UrlTemplateImageryProvider({
+    url : 'https://gitc-b.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=BlueMarble_ShadedRelief&style=default&tilematrixset=GoogleMapsCompatible_Level8&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}'
+  });
+  var borders = new Cesium.UrlTemplateImageryProvider({
+    url : 'https://gitc-a.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
+  });
+  var labels = new Cesium.UrlTemplateImageryProvider({
+    url : 'https://gitc-a.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Labels_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
+  });
+
+  viewer.imageryLayers.addImageryProvider(base);
+  viewer.imageryLayers.addImageryProvider(borders);
+  viewer.imageryLayers.addImageryProvider(labels);
 
   scene.highDynamicRange = true;
   globe.enableLighting = true;
@@ -56,6 +73,35 @@ window.startup = async function (Cesium) {
     }
   });
 };
+// Function to add labels to the grid
+function addGridLabels(viewer, minLat, maxLat, minLon, maxLon, latSpacing, lonSpacing) {
+    // Function to create a label
+    function createLabel(text, lon, lat) {
+        viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(lon, lat),
+            label: {
+                text: text,
+                font: '14px sans-serif',
+                fillColor: Cesium.Color.WHITE,
+                outlineColor: Cesium.Color.BLACK,
+                outlineWidth: 2,
+                style: Cesium.LabelStyle.FILL,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -9)
+            }
+        });
+    }
+
+    // Add latitude labels
+    for (let lat = minLat; lat <= maxLat; lat += latSpacing) {
+        createLabel(lat.toFixed(0) + "°", minLon, lat);
+    }
+
+    // Add longitude labels
+    for (let lon = minLon; lon <= maxLon; lon += lonSpacing) {
+        createLabel(lon.toFixed(0) + "°", lon, minLat);
+    }
+}
 async function fetchLiveStorms() {
   try {
       const response = await fetch('http://fluids.ai:1337/live-storms'); // Replace with your API endpoint
@@ -108,12 +154,15 @@ function plotStorms(groupedData, viewer) {
       storms.forEach((storm, index) => {
           // calculate the opacity based on the time difference from the most recent time
           const timeDiff = mostRecentTime - unixSeconds(storm.time);
-          const level = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
+          var level = Math.max(0, 1 - (timeDiff / (6 * 24 * 60 * 60))); // 6 days
           var opacity = level;
           if (timeDiff > 0) {
               opacity = Math.max(0.05, level - 0.1);
           }
-          console.log(`${storm.id} at ${storm.time} opacity: ${opacity}`)
+          else {
+            level = 3; // the most recent entry can be a greater level for easier visual cue
+          }
+          console.log(`${storm.id} at ${storm.time} opacity: ${opacity} level: ${level}`)
 
           // create description for each storm track record
           const description_html = `
@@ -287,7 +336,7 @@ async function createForecastMarkers(viewer) {
           let prevForecast = null;
 
           groupedForecasts[model][stormId].forEach(forecast => {
-              const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 100000);
+              const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 10000);
               // Add a marker for each forecast point
               viewer.entities.add({
                   position: position,
