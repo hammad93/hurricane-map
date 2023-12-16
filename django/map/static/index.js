@@ -36,6 +36,7 @@ window.startup = async function (Cesium) {
     timeline: false,
     imageryProvider: false,
     baseLayerPicker: false,
+    geocoder: false
   });
   const scene = viewer.scene;
   const globe = scene.globe;
@@ -43,13 +44,13 @@ window.startup = async function (Cesium) {
   // https://nasa-gibs.github.io/gibs-api-docs/access-advanced-topics/
   // https://nasa-gibs.github.io/gibs-api-docs/available-visualizations/
   var base = new Cesium.UrlTemplateImageryProvider({
-    url : 'https://gitc-b.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=BlueMarble_ShadedRelief&style=default&tilematrixset=GoogleMapsCompatible_Level8&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}'
+    url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=BlueMarble_ShadedRelief&style=default&tilematrixset=GoogleMapsCompatible_Level8&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
   var borders = new Cesium.UrlTemplateImageryProvider({
-    url : 'https://gitc-a.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
+    url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
   var labels = new Cesium.UrlTemplateImageryProvider({
-    url : 'https://gitc-a.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Labels_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
+    url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Labels_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
 
   viewer.imageryLayers.addImageryProvider(base);
@@ -68,6 +69,7 @@ window.startup = async function (Cesium) {
       const strongestStorm = findHighestWindSpeedEntry(groupedStorms);
       centerCameraOnLocation(viewer, strongestStorm.lat, strongestStorm.lon);
       createForecastMarkers(viewer);
+      createStormButtons(viewer, groupedStorms);
     } else {
       console.log('Failed to fetch forecasts data.');
     }
@@ -233,6 +235,37 @@ function getColorCode(knots) {
   } else {
       return "#b300b3"; // Category 5 - Fuchsia
   }
+}
+function createStormButtons(viewer, groupedData){
+    const recentEntries = findMostRecentEntries(groupedData);
+    let topOffset = 1; // Start with 1rem for the first button
+
+    Object.values(recentEntries).forEach(entry => {
+        const category = saffirSimpsonCategory(parseFloat(entry.wind_speed));
+        const iconPath = `static/${category}.png`; // Path to the icon
+        const topPosition = `${topOffset}rem`;
+
+        // Create the button with the icon
+        stormButtons.innerHTML += `
+            <button id="button${entry.id}" type="button" class="btn btn-success btn-sm" style="position: fixed; text-align: left; width: 8rem; top: ${topPosition}; right: 1rem;">
+                <img src="${iconPath}" alt="Category Icon" style="width: 1.5rem; height: 1.5rem;"> 
+                ${entry.id}
+            </button>`;
+        
+        topOffset += 2;
+    })
+
+    // Add click event listeners to animate camera to most recent entry
+    Object.values(recentEntries).forEach(entry => {
+        const button = document.getElementById(`button${entry.id}`);
+        if (button) {
+            button.onclick = function() {
+                // Define what happens when the button is clicked
+                console.log(`Button for ${entry.id} clicked`);
+                centerCameraOnLocation(viewer, entry.lat, entry.lon)
+            };
+        }
+    });
 }
 function findMostRecentEntries(groupedData) {
   const mostRecentEntries = {};
