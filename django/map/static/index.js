@@ -49,13 +49,13 @@ window.startup = async function (Cesium) {
   var borders = new Cesium.UrlTemplateImageryProvider({
     url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
-  var labels = new Cesium.UrlTemplateImageryProvider({
+  var map_labels = new Cesium.UrlTemplateImageryProvider({
     url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Labels_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
 
   viewer.imageryLayers.addImageryProvider(base);
   viewer.imageryLayers.addImageryProvider(borders);
-  viewer.imageryLayers.addImageryProvider(labels);
+  viewer.imageryLayers.addImageryProvider(map_labels);
 
   scene.highDynamicRange = true;
   globe.enableLighting = true;
@@ -74,6 +74,284 @@ window.startup = async function (Cesium) {
       console.log('Failed to fetch forecasts data.');
     }
   });
+  let mins = [
+    Cesium.Math.toRadians(0.05),
+    Cesium.Math.toRadians(0.1),
+    Cesium.Math.toRadians(0.2),
+    Cesium.Math.toRadians(0.5),
+    Cesium.Math.toRadians(1.0),
+    Cesium.Math.toRadians(2.0),
+    Cesium.Math.toRadians(5.0),
+    Cesium.Math.toRadians(10.0)
+    ];
+    let lastRefresh = 0;
+    let camera = viewer.camera;
+    let labels = new Cesium.LabelCollection();
+    scene.primitives.add(labels);
+    let polylines = new Cesium.PolylineCollection();
+    scene.primitives.add(polylines);
+    let ellipsoid = scene.globe.ellipsoid;
+    let currentExtent = getExtentView();
+
+    function updateLabelPositions() {
+        let center = screenCenterPosition();
+        center = new Cesium.Cartographic.fromCartesian(center);
+        var len = labels.length;
+        for (var i = 0; i < len; ++i) {
+            var b = labels.get(i);
+            let carto = new Cesium.Cartographic.fromCartesian(b.position);
+            if (b.isLat) carto.longitude = center.longitude;
+            else carto.latitude = center.latitude;
+            b.position = ellipsoid.cartographicToCartesian(carto);
+        }
+    }
+
+    function refresh() {
+        let lr = lastRefresh;
+        let now = new Date().getTime();
+        if (now - lr < 500) return;
+        updateLabelPositions();
+        let extent = getExtentView();
+        let shouldRefresh = true;
+        if (currentExtent) {
+            let w = Math.abs(extent.west - currentExtent.west),
+                s = Math.abs(extent.south - currentExtent.south),
+                e = Math.abs(extent.east - currentExtent.east),
+                n = Math.abs(extent.north - currentExtent.north);
+            let m = 0.001;
+            if (w < m && s < m && e < m && n < m) shouldRefresh = false;
+        }
+        if (!shouldRefresh && labels.length) return;
+        currentExtent = extent;
+        lr = now;
+        off();
+        on(extent);
+    }
+
+    function on(extent) {
+        drawGrid(extent);
+    }
+
+    function off() {
+        polylines.removeAll();
+        labels.removeAll();
+    }
+
+    function drawGrid(extent) {
+        if (!extent) extent = getExtentView();
+        polylines.removeAll();
+        labels.removeAll();
+
+        // var minPixel = 0;
+        // var maxPixel = this._canvasSize;
+
+        var dLat = 0,
+            dLng = 0,
+            index;
+        // get the nearest to the calculated value
+        for (
+            index = 0;
+            index < mins.length && dLat < (extent.north - extent.south) / 10;
+            index++
+        ) {
+            dLat = mins[index];
+        }
+        for (
+            index = 0;
+            index < mins.length && dLng < (extent.east - extent.west) / 10;
+            index++
+        ) {
+            dLng = mins[index];
+        }
+
+        // round iteration limits to the computed grid interval
+        var minLng =
+            (extent.west < 0
+                ? Math.ceil(extent.west / dLng)
+                : Math.floor(extent.west / dLng)) * dLng;
+        var minLat =
+            (extent.south < 0
+                ? Math.ceil(extent.south / dLat)
+                : Math.floor(extent.south / dLat)) * dLat;
+        var maxLng =
+            (extent.east < 0
+                ? Math.ceil(extent.east / dLat)
+                : Math.floor(extent.east / dLat)) * dLat;
+        var maxLat =
+            (extent.north < 0
+                ? Math.ceil(extent.north / dLng)
+                : Math.floor(extent.north / dLng)) * dLng;
+
+        // extend to make sure we cover for non refresh of tiles
+        minLng = Math.max(minLng - 2 * dLng, -Math.PI);
+        maxLng = Math.min(maxLng + 2 * dLng, Math.PI);
+        minLat = Math.max(minLat - 2 * dLat, -Math.PI / 2);
+        maxLat = Math.min(maxLat + 2 * dLng, Math.PI / 2);
+
+        var lat,
+            lng,
+            granularity = Cesium.Math.toRadians(1);
+
+        // labels positions
+        var latitudeText = minLat + Math.floor((maxLat - minLat) / dLat / 2) * dLat;
+
+        for (lng = minLng; lng < maxLng; lng += dLng) {
+            // draw meridian
+            var path = [];
+            for (lat = minLat; lat < maxLat; lat += granularity) {
+                path.push(new Cesium.Cartographic(lng, lat));
+            }
+            path.push(new Cesium.Cartographic(lng, maxLat));
+            var degLng = Cesium.Math.toDegrees(lng);
+            let text = convertDEGToDMS(degLng.toFixed(gridPrecision(dLng)));
+            let color =
+                text === "0°E" || text === "180°E"
+                    ? Cesium.Color.YELLOW
+                    : Cesium.Color.WHITE;
+            if (text !== "180°W") {
+                polylines.add({
+                    positions: ellipsoid.cartographicArrayToCartesianArray(path),
+                    width: 1,
+                    material: new Cesium.Material.fromType("Color", {
+                        color
+                    })
+                });
+                makeLabel(lng, latitudeText, text, false);
+            }
+        }
+
+        // lats
+        var longitudeText =
+            minLng + Math.floor((maxLng - minLng) / dLng / 2) * dLng;
+        for (lat = minLat; lat < maxLat; lat += dLat) {
+            // draw parallels
+            var path = [];
+            for (lng = minLng; lng < maxLng; lng += granularity) {
+                path.push(new Cesium.Cartographic(lng, lat));
+            }
+            path.push(new Cesium.Cartographic(maxLng, lat));
+            var degLat = Cesium.Math.toDegrees(lat);
+            let text = convertDEGToDMS(degLat.toFixed(gridPrecision(dLat)), true);
+            let color = text === "0°N" ? Cesium.Color.YELLOW : Cesium.Color.WHITE;
+            polylines.add({
+                positions: ellipsoid.cartographicArrayToCartesianArray(path),
+                width: 1,
+                material: new Cesium.Material.fromType("Color", {
+                    color
+                })
+            });
+            makeLabel(longitudeText, lat, text, true);
+        }
+    }
+
+    function makeLabel(lng, lat, text, isLat, color = "white") {
+        if (text === "0°N") text = "Equator";
+        if (text === "0°E") text = "Prime Meridian";
+        if (text === "180°E") text = "Antimeridian";
+        let center = new Cesium.Cartographic.fromCartesian(screenCenterPosition());
+        let carto = new Cesium.Cartographic(lng, lat);
+        if (isLat) carto.longitude = center.longitude;
+        else carto.latitude = center.latitude;
+        let position = ellipsoid.cartographicToCartesian(carto);
+        let label = labels.add({
+            position,
+            text,
+            font: "normal",
+            fillColor: color,
+            outlineColor: color,
+            style: Cesium.LabelStyle.FILL,
+            pixelOffset: new Cesium.Cartesian2(isLat ? 0 : 4, isLat ? -6 : 0),
+            eyeOffset: Cesium.Cartesian3.ZERO,
+            horizontalOrigin: isLat
+                ? Cesium.HorizontalOrigin.CENTER
+                : Cesium.HorizontalOrigin.LEFT,
+            verticalOrigin: isLat
+                ? Cesium.VerticalOrigin.BOTTOM
+                : Cesium.VerticalOrigin.TOP,
+            scale: 1.0
+        });
+        label.isLat = isLat;
+    }
+
+    function gridPrecision(dDeg) {
+        if (dDeg < 0.01) return 3;
+        if (dDeg < 0.1) return 2;
+        if (dDeg < 1) return 1;
+        return 0;
+    }
+
+    function screenCenterPosition() {
+        let canvas = scene.canvas;
+        let center = new Cesium.Cartesian2(
+            Math.round(canvas.clientWidth / 2),
+            Math.round(canvas.clientHeight / 2)
+        );
+        var cartesian =camera.pickEllipsoid(center);
+
+    if(!cartesian) cartesian = new Cesium.Cartesian3.fromDegrees(0,0,0);
+        return cartesian;
+    }
+
+    function getExtentView() {
+        var camera = scene.camera;
+        var canvas = scene.canvas;
+        var corners = [
+            camera.pickEllipsoid(new Cesium.Cartesian2(0, 0), ellipsoid),
+            camera.pickEllipsoid(new Cesium.Cartesian2(canvas.width, 0), ellipsoid),
+            camera.pickEllipsoid(
+                new Cesium.Cartesian2(0, canvas.height),
+                ellipsoid
+            ),
+            camera.pickEllipsoid(
+                new Cesium.Cartesian2(canvas.width, canvas.height),
+                ellipsoid
+            )
+        ];
+        for (var index = 0; index < 4; index++) {
+            if (corners[index] === undefined) {
+                return Cesium.Rectangle.MAX_VALUE;
+            }
+        }
+        return Cesium.Rectangle.fromCartographicArray(
+            ellipsoid.cartesianArrayToCartographicArray(corners)
+        );
+    }
+
+    function convertDEGToDMS(deg, lat) {
+        var absolute = Math.abs(deg);
+
+        var degrees = Math.floor(absolute);
+        var minutesNotTruncated = (absolute - degrees) * 60;
+        var minutes = Math.floor(minutesNotTruncated);
+        var seconds = ((minutesNotTruncated - minutes) * 60).toFixed(2);
+
+        let direction = lat ? (deg >= 0 ? "N" : "S") : deg >= 0 ? "E" : "W";
+        let text = degrees + "°";
+        if (minutes || seconds !== "0.00") text += minutes + "'";
+        if (seconds !== "0.00") text += seconds + '"';
+        text += direction;
+
+        return text;
+    }
+
+    let pH = 0,
+        pLat = 0,
+        pLon = 0,
+        pHeading = 0;
+
+    viewer.clock.onTick.addEventListener(function() {
+        let { pitch, positionCartographic, heading } = camera;
+        let h = positionCartographic.height;
+        let lat = positionCartographic.latitude;
+        let lon = positionCartographic.longitude;
+        if (h !== pH || lat !== pLat || lon !== pLon || heading !== pHeading) {
+                pH = h;
+                pLat = lat;
+                pLon = lon;
+                pHeading = heading;
+                refresh();
+        }
+    });
 };
 // Function to add labels to the grid
 function addGridLabels(viewer, minLat, maxLat, minLon, maxLon, latSpacing, lonSpacing) {
