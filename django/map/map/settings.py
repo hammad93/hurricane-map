@@ -83,20 +83,20 @@ WSGI_APPLICATION = 'map.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
             'read_default_file': keys['path'] + 'database.key'
         },
     },
     'hurricane_archive': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hurricane_archive',
         'OPTIONS': {
             'read_default_file': keys['path'] + 'database.key'
         },
     },
     'hurricane_live': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hurricane_live',
         'OPTIONS': {
             'read_default_file': keys['path'] + 'hurricane-live-db.key'
