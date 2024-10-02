@@ -33,7 +33,7 @@ SECRET_KEY = keys['django']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['fluids.ai']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
