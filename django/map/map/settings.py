@@ -93,16 +93,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
-            'service': keys['path'] + 'hurricane-live-db.key',
-            'passfile': keys['path'] + '.my_pgpass'
+            'service': 'hurricane_live',
+            'passfile': '.my_pgpass'
         },
     },
     'hurricane_live': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hurricane_live',
         'OPTIONS': {
-            'service': keys['path'] + 'hurricane-live-db.key',
-            'passfile': keys['path'] + '.my_pgpass'
+            'service': 'hurricane_live',
+            'passfile': '.my_pgpass'
         },
     },
 }
