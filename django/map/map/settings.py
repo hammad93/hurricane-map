@@ -80,14 +80,7 @@ WSGI_APPLICATION = 'map.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'read_default_file': keys['path'] + 'database.key'
-        },
-    },
+'''
     'hurricane_archive': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hurricane_archive',
@@ -95,11 +88,21 @@ DATABASES = {
             'read_default_file': keys['path'] + 'database.key'
         },
     },
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            'service': keys['path'] + 'hurricane-live-db.key',
+            'passfile': keys['path'] + '.my_pgpass'
+        },
+    },
     'hurricane_live': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hurricane_live',
         'OPTIONS': {
-            'read_default_file': keys['path'] + 'hurricane-live-db.key'
+            'service': keys['path'] + 'hurricane-live-db.key',
+            'passfile': keys['path'] + '.my_pgpass'
         },
     },
 }
