@@ -22,7 +22,7 @@ def index(request):
         live_storms = cursor.fetchall()
     
     return render(request, 'index.html', {
-                'hurricanes': hurricanes,
+                #'hurricanes': hurricanes,
                 'live_storms': [{
                     'id': storm[0],
                     'time': storm[1],
