@@ -11,11 +11,13 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import pandas as pd
 
 # get the keys, passwords, and related configuration
 keys = {
     'path' : str(Path(__file__).parent.absolute()) + '/keys/'
 }
+keys['credentials'] = pd.read_csv(keys['path'] + 'credentials.csv')
 with open(keys['path'] + 'django_secret.key', 'r') as file:
     keys['django'] = file.read()
 
@@ -89,24 +91,19 @@ WSGI_APPLICATION = 'map.wsgi.application'
         },
     },
 '''
+postgres_creds = keys['credentials'][keys['credentials']['user'] == 'postgres'].iloc[0]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'service': 'hurricane_live',
-            'passfile': '.my_pgpass'
-        },
-    },
-    'hurricane_live': {
-        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hurricane_live',
-        'OPTIONS': {
-            'service': 'hurricane_live',
-            'passfile': '.my_pgpass'
-        },
+        'USER': 'postgres',
+        'PASSWORD': postgres_creds['pass'],
+        'HOST': postgres_creds['host'],
+        'PORT': postgres_creds['port']
     },
 }
-
+DATABASES['hurricane_live'] = DATABASES['default']
+DATABASES['hurricane_archive'] = DATABASES['default']
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

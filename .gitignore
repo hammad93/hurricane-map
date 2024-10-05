@@ -3,6 +3,8 @@
 
 # Keys & Passwords
 *.key
+.my_pgpass
+.pg_service.conf
 
 # Other
 *.pyc
