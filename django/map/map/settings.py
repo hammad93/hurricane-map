@@ -99,7 +99,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': postgres_creds['pass'],
         'HOST': postgres_creds['host'],
-        'PORT': postgres_creds['port']
+        'PORT': int(postgres_creds['port'])
     },
 }
 DATABASES['hurricane_live'] = DATABASES['default']
