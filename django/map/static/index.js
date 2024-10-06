@@ -525,7 +525,7 @@ function createStormButtons(viewer, groupedData){
 
         // Create the button with the icon
         stormButtons.innerHTML += `
-            <button id="button${entry.id}" type="button" class="btn btn-success btn-sm" style="position: fixed; text-align: left; width: 8rem; top: ${topPosition}; right: 1rem;">
+            <button id="button${entry.id}" type="button" class="btn btn-success btn-sm" style="position: fixed; text-align: left; width: 8rem; top: ${topPosition}; left: 1rem;">
                 <img src="${iconPath}" alt="Category Icon" style="width: 1.5rem; height: 1.5rem;"> 
                 ${entry.id}
             </button>`;
