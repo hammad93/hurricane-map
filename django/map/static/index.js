@@ -448,13 +448,14 @@ function plotStorms(groupedData, viewer) {
           const description_html = `
                   <h4>Storm History</h4>
                   <ul>
+                      <li><strong>Source:</strong> ${storm.source}</li>
                       <li><strong>Storm ID:</strong> ${storm.id}</li>
                       <li><strong>Time:</strong> ${storm.time}</li>
                       <li><strong>Latitude:</strong> ${storm.lat}</li>
                       <li><strong>Longitude:</strong> ${storm.lon}</li>
                       <li><strong>Wind Speed (knots):</strong> ${storm.wind_speed}</li>
                       <li><strong>Wind Speed (mph):</strong> ${storm.wind_speed_mph}</li>
-                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kph}</li>
+                      <li><strong>Wind Speed (km/h):</strong> ${storm.wind_speed_kmph}</li>
                   </ul>
           `
           // Add a marker for each storm point
