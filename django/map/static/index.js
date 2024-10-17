@@ -68,7 +68,7 @@ window.startup = async function (Cesium) {
       plotStorms(groupedStorms, viewer);
       const strongestStorm = findHighestWindSpeedEntry(groupedStorms);
       centerCameraOnLocation(viewer, strongestStorm.lat, strongestStorm.lon);
-      createForecastMarkers(viewer);
+      createForecastMarkers(viewer, groupedStorms);
       createStormButtons(viewer, groupedStorms);
     } else {
       console.log('Failed to fetch forecasts data.');
@@ -622,7 +622,7 @@ async function fetchForecasts() {
     return null;
   }
 }
-async function createForecastMarkers(viewer) {
+async function createForecastMarkers(viewer, liveData) {
     const forecasts = await fetchForecasts();
     if (!forecasts) {
         console.error('Failed to fetch forecasts');
@@ -633,6 +633,49 @@ async function createForecastMarkers(viewer) {
     Object.keys(forecasts).forEach(stormId => {
         let positions = [];
         let prevForecast = null;
+
+        // Check if there's live storm data for the current storm ID
+        if (liveData[stormId] && liveData[stormId].length > 0) {
+            const latestStormData = liveData[stormId][liveData[stormId].length - 1];
+            const livePosition = Cesium.Cartesian3.fromDegrees(latestStormData.lon, latestStormData.lat, 10000);
+
+            // Add a marker for the live storm position
+            viewer.entities.add({
+                position: livePosition,
+                point: {
+                    pixelSize: 5,
+                    color: Cesium.Color.YELLOW,
+                    outlineColor: Cesium.Color.BLACK,
+                    outlineWidth: 1
+                },
+                description: `
+                    <h4>Live Storm Data</h4>
+                    <ul>
+                        <li><strong>ID:</strong> ${stormId}</li>
+                        <li><strong>Time:</strong> ${latestStormData.time}</li>
+                        <li><strong>Latitude:</strong> ${latestStormData.lat}</li>
+                        <li><strong>Longitude:</strong> ${latestStormData.lon}</li>
+                        <li><strong>Wind Speed:</strong> ${latestStormData.wind_speed} knots</li>
+                    </ul>
+                `
+            });
+
+            // Connect the live storm position to the first forecasted position
+            const firstForecast = forecasts[stormId][0];
+            const firstForecastPosition = Cesium.Cartesian3.fromDegrees(firstForecast.lon, firstForecast.lat, 10000);
+
+            // Draw a polyline from the live storm to the first forecast position
+            viewer.entities.add({
+                polyline: {
+                    positions: [livePosition, firstForecastPosition],
+                    width: 2,
+                    material: Cesium.Color.CYAN.withAlpha(0.8)
+                }
+            });
+
+            // Add the live position to the positions array to maintain connection continuity
+            positions.push(livePosition);
+        }
 
         // Iterate over each forecast for the current storm ID
         forecasts[stormId].forEach(forecast => {
@@ -687,6 +730,7 @@ async function createForecastMarkers(viewer) {
         }
     });
 }
+
 
 if (typeof Cesium !== 'undefined') {
     window.startupCalled = true;
