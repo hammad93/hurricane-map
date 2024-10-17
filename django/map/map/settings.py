@@ -14,12 +14,12 @@ from pathlib import Path
 import pandas as pd
 
 # get the keys, passwords, and related configuration
-'''
+
 keys = {
     'path' : str(Path(__file__).parent.absolute()) + '/keys/'
 }
-keys['credentials'] = pd.read_csv(keys['path'] + 'credentials.csv')
-'''
+#keys['credentials'] = pd.read_csv(keys['path'] + 'credentials.csv')
+
 with open(keys['path'] + 'django_secret.key', 'r') as file:
     keys['django'] = file.read()
 

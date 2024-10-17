@@ -20,6 +20,4 @@ def index(request):
         cursor.execute("select * from hurricane_live")
         live_storms = cursor.fetchall()
     '''
-    
-    
     return render(request, 'index.html')
