@@ -14,10 +14,12 @@ from pathlib import Path
 import pandas as pd
 
 # get the keys, passwords, and related configuration
+'''
 keys = {
     'path' : str(Path(__file__).parent.absolute()) + '/keys/'
 }
 keys['credentials'] = pd.read_csv(keys['path'] + 'credentials.csv')
+'''
 with open(keys['path'] + 'django_secret.key', 'r') as file:
     keys['django'] = file.read()
 
@@ -90,7 +92,7 @@ WSGI_APPLICATION = 'map.wsgi.application'
             'read_default_file': keys['path'] + 'database.key'
         },
     },
-'''
+
 postgres_creds = keys['credentials'][keys['credentials']['user'] == 'postgres'].iloc[0]
 DATABASES = {
     'default': {
@@ -104,6 +106,7 @@ DATABASES = {
 }
 DATABASES['hurricane_live'] = DATABASES['default']
 DATABASES['hurricane_archive'] = DATABASES['default']
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

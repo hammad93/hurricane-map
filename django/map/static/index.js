@@ -615,89 +615,77 @@ async function fetchForecasts() {
     const jsonData = await response.json();
 
     // Filter out the models that are defined as 'gpt-3.5-turbo'
-    const filteredData = jsonData.filter(item => item.model !== 'gpt-3.5-turbo');
-    return filteredData;
+    //const filteredData = jsonData.filter(item => item.model !== 'gpt-3.5-turbo');
+    return jsonData;
   } catch (error) {
     console.error('Error fetching forecasts:', error);
     return null;
   }
 }
 async function createForecastMarkers(viewer) {
-  const forecasts = await fetchForecasts();
-  if (!forecasts) {
-      console.error('Failed to fetch forecasts');
-      return;
-  }
+    const forecasts = await fetchForecasts();
+    if (!forecasts) {
+        console.error('Failed to fetch forecasts');
+        return;
+    }
 
-  const groupedForecasts = {};
+    // Iterate over each storm in the forecast data
+    Object.keys(forecasts).forEach(stormId => {
+        let positions = [];
+        let prevForecast = null;
 
-  // Group forecasts by model and then by storm ID
-  forecasts.forEach(forecast => {
-      if (!groupedForecasts[forecast.model]) {
-          groupedForecasts[forecast.model] = {};
-      }
-      if (!groupedForecasts[forecast.model][forecast.id]) {
-          groupedForecasts[forecast.model][forecast.id] = [];
-      }
-      groupedForecasts[forecast.model][forecast.id].push(forecast);
-  });
+        // Iterate over each forecast for the current storm ID
+        forecasts[stormId].forEach(forecast => {
+            const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 10000);
 
-  Object.keys(groupedForecasts).forEach(model => {
-      Object.keys(groupedForecasts[model]).forEach(stormId => {
-          let positions = [];
-          let prevForecast = null;
+            // Add a marker for each forecast point
+            viewer.entities.add({
+                position: position,
+                point: {
+                    pixelSize: 5,
+                    color: Cesium.Color.WHITE,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 1
+                },
+                description: `
+                    <h4>Forecast Details</h4>
+                    <ul>
+                        <li><strong>ID:</strong> ${stormId}</li>
+                        <li><strong>Time:</strong> ${forecast.forecast_time}</li>
+                        <li><strong>Latitude:</strong> ${forecast.lat}</li>
+                        <li><strong>Longitude:</strong> ${forecast.lon}</li>
+                        <li><strong>Wind Speed:</strong> ${forecast.wind_speed} knots</li>
+                    </ul>
+                `
+            });
 
-          groupedForecasts[model][stormId].forEach(forecast => {
-              const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 10000);
-              // Add a marker for each forecast point
-              viewer.entities.add({
-                  position: position,
-                  point: {
-                      pixelSize: 5,
-                      color: Cesium.Color.WHITE,
-                      outlineColor: Cesium.Color.WHITE,
-                      outlineWidth: 1
-                  },
-                  description: `
-                      <h4>Forecast Details</h4>
-                      <ul>
-                          <li><strong>Model:</strong> ${forecast.model}</li>
-                          <li><strong>ID:</strong> ${forecast.id}</li>
-                          <li><strong>Time:</strong> ${forecast.time}</li>
-                          <li><strong>Latitude:</strong> ${forecast.lat}</li>
-                          <li><strong>Longitude:</strong> ${forecast.lon}</li>
-                          <li><strong>Wind Speed:</strong> ${forecast.wind_speed} knots</li>
-                      </ul>
-                  `
-              });
+            // Handle International Date Line crossing
+            if (prevForecast && Math.abs(prevForecast.lon - forecast.lon) > 180) {
+                viewer.entities.add({
+                    polyline: {
+                        positions: positions,
+                        width: 2,
+                        material: Cesium.Color.FUCHSIA.withAlpha(0.8)
+                    }
+                });
+                positions = [];
+            }
 
-              if (prevForecast && Math.abs(prevForecast.lon - forecast.lon) > 180) {
-                  // Handle crossing the International Date Line
-                  viewer.entities.add({
-                      polyline: {
-                          positions: positions,
-                          width: 2,
-                          material: Cesium.Color.FUCHSIA.withAlpha(0.8)
-                      }
-                  });
-                  positions = [];
-              }
-              prevForecast = forecast;
-              positions.push(position);
-          });
+            prevForecast = forecast;
+            positions.push(position);
+        });
 
-          if (positions.length > 0) {
-              // Create and add the polyline for the current storm ID group
-              viewer.entities.add({
-                  polyline: {
-                      positions: positions,
-                      width: 2,
-                      material: Cesium.Color.FUCHSIA.withAlpha(0.8)
-                  }
-              });
-          }
-      });
-  });
+        // Add the polyline for the storm if positions exist
+        if (positions.length > 0) {
+            viewer.entities.add({
+                polyline: {
+                    positions: positions,
+                    width: 2,
+                    material: Cesium.Color.FUCHSIA.withAlpha(0.8)
+                }
+            });
+        }
+    });
 }
 
 if (typeof Cesium !== 'undefined') {
