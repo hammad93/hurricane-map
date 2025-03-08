@@ -49,13 +49,9 @@ window.startup = async function (Cesium) {
   var borders = new Cesium.UrlTemplateImageryProvider({
     url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
-  var map_labels = new Cesium.UrlTemplateImageryProvider({
-    url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Labels_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
-  });
 
   viewer.imageryLayers.addImageryProvider(base);
   viewer.imageryLayers.addImageryProvider(borders);
-  viewer.imageryLayers.addImageryProvider(map_labels);
 
   scene.highDynamicRange = true;
   globe.enableLighting = true;
@@ -636,7 +632,7 @@ async function createForecastMarkers(viewer, liveData) {
 
         // Check if there's live storm data for the current storm ID
         if (liveData[stormId] && liveData[stormId].length > 0) {
-            const latestStormData = liveData[stormId][liveData[stormId].length - 1];
+            const latestStormData = liveData[stormId][0];
             const livePosition = Cesium.Cartesian3.fromDegrees(latestStormData.lon, latestStormData.lat, 10000);
 
             // Add a marker for the live storm position
