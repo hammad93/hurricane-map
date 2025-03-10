@@ -630,8 +630,9 @@ async function createForecastMarkers(viewer, liveData) {
         let positions = [];
         let prevForecast = null;
 
-        // Check if there's live storm data for the current storm ID
-        if (liveData[stormId] && liveData[stormId].length > 0) {
+        // Check if there's live storm data and forecasts for the current storm ID
+        // Place forecasts on visualization if we meet the criteria
+        if (liveData[stormId] && liveData[stormId].length > 0 && forecasts[stormId].length > 0) {
             const latestStormData = liveData[stormId][0];
             const livePosition = Cesium.Cartesian3.fromDegrees(latestStormData.lon, latestStormData.lat, 10000);
 
@@ -655,7 +656,6 @@ async function createForecastMarkers(viewer, liveData) {
                     </ul>
                 `
             });
-
             // Connect the live storm position to the first forecasted position
             const firstForecast = forecasts[stormId][0];
             const firstForecastPosition = Cesium.Cartesian3.fromDegrees(firstForecast.lon, firstForecast.lat, 10000);
