@@ -380,7 +380,7 @@ function addGridLabels(viewer, minLat, maxLat, minLon, maxLon, latSpacing, lonSp
 }
 async function fetchLiveStorms() {
   try {
-      const response = await fetch('https://nfc.ai:1337/live-storms'); // Replace with your API endpoint
+      const response = await fetch('https://nfc.ai/live-storms'); // Replace with your API endpoint
       if (!response.ok) {
           throw new Error(`HTTP error: ${response.status}`);
       }
@@ -600,7 +600,7 @@ function centerCameraOnLocation(viewer, latitude, longitude, zoomLevel = 1000000
 }
 async function fetchForecasts() {
   try {
-    const response = await fetch('https://nfc.ai:1337/forecasts');
+    const response = await fetch('https://nfc.ai/forecasts');
 
     // Check if the request was successful
     if (!response.ok) {
