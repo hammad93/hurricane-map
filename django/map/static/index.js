@@ -41,10 +41,16 @@ window.startup = async function (Cesium) {
   const scene = viewer.scene;
   const globe = scene.globe;
   
-  // https://nasa-gibs.github.io/gibs-api-docs/access-advanced-topics/
-  // https://nasa-gibs.github.io/gibs-api-docs/available-visualizations/
+  /**
+  https://nasa-gibs.github.io/gibs-api-docs/access-advanced-topics/
+  https://nasa-gibs.github.io/gibs-api-docs/available-visualizations/
+
   var base = new Cesium.UrlTemplateImageryProvider({
     url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=BlueMarble_ShadedRelief&style=default&tilematrixset=GoogleMapsCompatible_Level8&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}'
+  });
+  **/
+  var base = new Cesium.UrlTemplateImageryProvider({
+    url : 'https://nfc.ai/geoserver/gwc/service/wmts?layer=primary%3ABlue_Marble_2002.png&style=&tilematrixset=EPSG%3A900913&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix=EPSG%3A900913%3A{z}&TileCol={x}&TileRow={y}'
   });
   var borders = new Cesium.UrlTemplateImageryProvider({
     url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
