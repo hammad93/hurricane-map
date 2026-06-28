@@ -636,51 +636,8 @@ async function createForecastMarkers(viewer, liveData) {
         let positions = [];
         let prevForecast = null;
 
-        // Check if there's live storm data and forecasts for the current storm ID
-        // Place forecasts on visualization if we meet the criteria
-        if (liveData[stormId] && liveData[stormId].length > 0 && forecasts[stormId].length > 0) {
-            const latestStormData = liveData[stormId][0];
-            const livePosition = Cesium.Cartesian3.fromDegrees(latestStormData.lon, latestStormData.lat, 10000);
-
-            // Add a marker for the live storm position
-            viewer.entities.add({
-                position: livePosition,
-                point: {
-                    pixelSize: 5,
-                    color: Cesium.Color.YELLOW,
-                    outlineColor: Cesium.Color.BLACK,
-                    outlineWidth: 1
-                },
-                description: `
-                    <h4>Live Storm Data</h4>
-                    <ul>
-                        <li><strong>ID:</strong> ${stormId}</li>
-                        <li><strong>Time:</strong> ${latestStormData.time}</li>
-                        <li><strong>Latitude:</strong> ${latestStormData.lat}</li>
-                        <li><strong>Longitude:</strong> ${latestStormData.lon}</li>
-                        <li><strong>Wind Speed:</strong> ${latestStormData.wind_speed} knots</li>
-                    </ul>
-                `
-            });
-            // Connect the live storm position to the first forecasted position
-            const firstForecast = forecasts[stormId][0];
-            const firstForecastPosition = Cesium.Cartesian3.fromDegrees(firstForecast.lon, firstForecast.lat, 10000);
-
-            // Draw a polyline from the live storm to the first forecast position
-            viewer.entities.add({
-                polyline: {
-                    positions: [livePosition, firstForecastPosition],
-                    width: 2,
-                    material: Cesium.Color.CYAN.withAlpha(0.8)
-                }
-            });
-
-            // Add the live position to the positions array to maintain connection continuity
-            positions.push(livePosition);
-        }
-
         // Iterate over each forecast for the current storm ID
-	const forecastsByModel = {};                     // model → array of forecasts
+	const forecastsByModel = {};
 	forecasts[stormId].forEach(forecast => {
 	    const model = forecast.model || 'UNKNOWN_MODEL';
 	    if (!forecastsByModel[model]) {
@@ -730,6 +687,7 @@ async function createForecastMarkers(viewer, liveData) {
                 positions.push(position);
                 prevForecast = forecast;
             });
+	    // draw the forecast path
             if (positions.length > 0) {
                 viewer.entities.add({
                     polyline: {
@@ -738,6 +696,18 @@ async function createForecastMarkers(viewer, liveData) {
                         material: Cesium.Color.FUCHSIA.withAlpha(0.8)
                     }
                 });
+		// draw first forecast to live position
+		const first = modelForecasts[0];
+		const firstPos = Cesium.Cartesian3.fromDegrees(parseFloat(first.lon), parseFloat(first.lat), 10000);
+		const live = liveData[stormId][0];
+		const livePos = Cesium.Cartesian3.fromDegrees(parseFloat(live.lon), parseFloat(live.lat), 10000);
+		viewer.entities.add({
+		    polyline: {
+			positions: [livePos, firstPos],
+			width: 2,
+			material: Cesium.Color.CYAN.withAlpha(0.8)
+		    }
+		});
             }
         });
     });
