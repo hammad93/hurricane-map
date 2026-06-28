@@ -355,35 +355,7 @@ window.startup = async function (Cesium) {
         }
     });
 };
-// Function to add labels to the grid
-function addGridLabels(viewer, minLat, maxLat, minLon, maxLon, latSpacing, lonSpacing) {
-    // Function to create a label
-    function createLabel(text, lon, lat) {
-        viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(lon, lat),
-            label: {
-                text: text,
-                font: '14px sans-serif',
-                fillColor: Cesium.Color.WHITE,
-                outlineColor: Cesium.Color.BLACK,
-                outlineWidth: 2,
-                style: Cesium.LabelStyle.FILL,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                pixelOffset: new Cesium.Cartesian2(0, -9)
-            }
-        });
-    }
 
-    // Add latitude labels
-    for (let lat = minLat; lat <= maxLat; lat += latSpacing) {
-        createLabel(lat.toFixed(0) + "°", minLon, lat);
-    }
-
-    // Add longitude labels
-    for (let lon = minLon; lon <= maxLon; lon += lonSpacing) {
-        createLabel(lon.toFixed(0) + "°", lon, minLat);
-    }
-}
 async function fetchLiveStorms() {
   try {
       const response = await fetch('https://nfc.ai/mcp/live-storms'); // Replace with your API endpoint
