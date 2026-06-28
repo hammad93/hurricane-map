@@ -680,32 +680,57 @@ async function createForecastMarkers(viewer, liveData) {
         }
 
         // Iterate over each forecast for the current storm ID
-        forecasts[stormId].forEach(forecast => {
-            const position = Cesium.Cartesian3.fromDegrees(forecast.lon, forecast.lat, 10000);
+	const forecastsByModel = {};                     // model → array of forecasts
+	forecasts[stormId].forEach(forecast => {
+	    const model = forecast.model || 'UNKNOWN_MODEL';
+	    if (!forecastsByModel[model]) {
+		forecastsByModel[model] = [];
+    	    }
+   	    forecastsByModel[model].push(forecast);
+	});
+	Object.entries(forecastsByModel).forEach(([modelName, modelForecasts]) => {
+            let prevForecast = null;
+            let positions = [];
 
-            // Add a marker for each forecast point
-            viewer.entities.add({
-                position: position,
-                point: {
-                    pixelSize: 5,
-                    color: Cesium.Color.WHITE,
-                    outlineColor: Cesium.Color.WHITE,
-                    outlineWidth: 1
-                },
-                description: `
-                    <h4>Forecast Details</h4>
-                    <ul>
-                        <li><strong>ID:</strong> ${stormId}</li>
-                        <li><strong>Time:</strong> ${forecast.forecast_time}</li>
-                        <li><strong>Latitude:</strong> ${forecast.lat}</li>
-                        <li><strong>Longitude:</strong> ${forecast.lon}</li>
-                        <li><strong>Wind Speed:</strong> ${forecast.wind_speed} knots</li>
-                    </ul>
-                `
+            modelForecasts.forEach(forecast => {
+                const position = Cesium.Cartesian3.fromDegrees(parseFloat(forecast.lon), parseFloat(forecast.lat), 10000);
+                viewer.entities.add({
+                    position: position,
+                    point: {
+                        pixelSize: 5,
+                        color: Cesium.Color.WHITE,
+                        outlineColor: Cesium.Color.WHITE,
+                        outlineWidth: 1
+                    },
+                    description: `
+                        <h4>Forecast Details (Model: ${modelName})</h4>
+                        <ul>
+                            <li><strong>ID:</strong> ${stormId}</li>
+                            <li><strong>Time:</strong> ${forecast.forecast_time}</li>
+                            <li><strong>Latitude:</strong> ${forecast.lat}</li>
+                            <li><strong>Longitude:</strong> ${forecast.lon}</li>
+                            <li><strong>Wind Speed:</strong> ${forecast.wind_speed} knots</li>
+                        </ul>
+                    `
+                });
+
+                if (prevForecast && Math.abs(parseFloat(prevForecast.lon) - parseFloat(forecast.lon)) > 180) {
+                    // Close the current polyline and start a new one
+                    if (positions.length > 0) {
+                        viewer.entities.add({
+                            polyline: {
+                                positions: positions,
+                                width: 2,
+                                material: Cesium.Color.FUCHSIA.withAlpha(0.8)
+                            }
+                        });
+                    }
+                    positions = []; // reset for the segment after the wrap‑around
+                }
+                positions.push(position);
+                prevForecast = forecast;
             });
-
-            // Handle International Date Line crossing
-            if (prevForecast && Math.abs(prevForecast.lon - forecast.lon) > 180) {
+            if (positions.length > 0) {
                 viewer.entities.add({
                     polyline: {
                         positions: positions,
@@ -713,23 +738,8 @@ async function createForecastMarkers(viewer, liveData) {
                         material: Cesium.Color.FUCHSIA.withAlpha(0.8)
                     }
                 });
-                positions = [];
             }
-
-            prevForecast = forecast;
-            positions.push(position);
         });
-
-        // Add the polyline for the storm if positions exist
-        if (positions.length > 0) {
-            viewer.entities.add({
-                polyline: {
-                    positions: positions,
-                    width: 2,
-                    material: Cesium.Color.FUCHSIA.withAlpha(0.8)
-                }
-            });
-        }
     });
 }
 
