@@ -393,7 +393,7 @@ async function createForecastMarkers(viewer, liveData) {
 		// draw first forecast to live position
 		const first = modelForecasts[0];
 		const firstPos = Cesium.Cartesian3.fromDegrees(parseFloat(first.lon), parseFloat(first.lat), 10000);
-		const live = liveData[stormId][0];
+		const live = liveData[stormId][liveData[stormId].length - 1];
 		const livePos = Cesium.Cartesian3.fromDegrees(parseFloat(live.lon), parseFloat(live.lat), 10000);
 		viewer.entities.add({
 		    polyline: {
