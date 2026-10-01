@@ -55,8 +55,19 @@ window.startup = async function (Cesium) {
   var borders = new Cesium.UrlTemplateImageryProvider({
     url : 'https://gitc-{s}.earthdata.nasa.gov/wmts/epsg3857/best/wmts.cgi?layer=Reference_Features_15m&style=default&tilematrixset=GoogleMapsCompatible_Level13&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}'
   });
+  var goes_16 = new Cesium.WebMapServiceImageryProvider({
+    url: 'https://nfc.ai/geoserver/wms', 
+    layers: 'primary:GOES-16',
+    parameters: {
+      service: 'WMS',
+      version: '1.1.1',
+      transparent: true,
+      format: 'image/png'
+    }
+  });
 
   viewer.imageryLayers.addImageryProvider(base);
+  viewer.imageryLayers.addImageryProvider(goes_16);
   viewer.imageryLayers.addImageryProvider(borders);
 
   scene.highDynamicRange = true;
